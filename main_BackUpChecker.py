@@ -23,13 +23,15 @@ while True:
     try:
         # Получаем данные с файла
         f = open(file_path, 'r')
-        name_comp = f.readline()
-        for line in f:
+        name_comp = f.readline()  # Получаем имя компа
+        for line in f:  # Получаем пути к файлам
             paths.append(line)
+
     except (FileNotFoundError, ValueError):
         # Если файла нет, сохраняем ошибку, что его не было и мы его создали
         with open(CommandWorker.get_path("work_log_ch.txt"), 'w') as er_f:
             er_f.write('File "filepaths_ch.txt" does not exist.\nScript make the file ""filepaths_ch.txt"".')
+        # Создаём файл для записи
         with open(file_path, 'w') as m_f:
             m_f.write('')
         # Выходим из программы при ошибке
