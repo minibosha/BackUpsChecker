@@ -1,40 +1,49 @@
 """ Скачиваем библиотеки """
-import os
-import subprocess
-import time
-import sys
+from datetime import date, timedelta
 # Скачиваем дополнительные файлы
-import File_helper
-import Mail_sender
-import Tg_sender
+from File_helper import FileHelper
 from Command_worker import CommandWorker
+from Error_feedback import *
+
+
+''' Функции '''
+def get_dates():
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    today_str = today.strftime("%d.%m.%Y")
+    yesterday_str = yesterday.strftime("%d.%m.%Y")
+    return [today_str, yesterday_str]
 
 
 ''' Основная программа '''
 while True:
     '''Переменные для программы '''
+    data_info = {'name': ['bytes', 'date']}  # Пример
     error_log = []
-    name_comp = ''
-    paths = []
+    files = FileHelper()  # Класс для быстрой работы с файлами
 
-    ''' Считываем данные с файла и создаём его, если файла нет '''
-    # Путь, где находиться скрипт
-    file_path = CommandWorker.get_path("filepaths_ch.txt")
-    try:
-        # Получаем данные с файла
-        f = open(file_path, 'r')
-        name_comp = f.readline()  # Получаем имя компа
-        for line in f:  # Получаем пути к файлам
-            paths.append(line)
+    ''' Считываем данные с файла '''
+    name_comp, paths = files.log_file()
 
-    except (FileNotFoundError, ValueError):
-        # Если файла нет, сохраняем ошибку, что его не было и мы его создали
-        with open(CommandWorker.get_path("work_log_ch.txt"), 'w') as er_f:
-            er_f.write('File "filepaths_ch.txt" does not exist.\nScript make the file ""filepaths_ch.txt"".')
-        # Создаём файл для записи
-        with open(file_path, 'w') as m_f:
-            m_f.write('')
-        # Выходим из программы при ошибке
-        sys.exit(1)
+    ''' Получаем командой информацию о файлах в пути через dir '''
+    for path in paths:
+        answer_cmd = CommandWorker.command_get('dir ' + path).split()  # Получаем ответ от cmd
+        curr_date, prev_date = get_dates()  # Получаем сегодняшнюю и вчерашнюю дату
+        # Находим все файлы и их информацию
+        for ind, word in enumerate(answer_cmd[:len(answer_cmd) - 3]):
+            if word == curr_date:
+                # Добавляем имя файла и информацию о нём
+                name = answer_cmd[ind + 3]
+                if name not in ['.', '..', '...']:
+                    bytes = answer_cmd[ind + 2]
+                    data_info[name] = [bytes, curr_date]
+            elif word == prev_date:
+                name = answer_cmd[ind + 3]
+                if name not in ['.', '..', '...'] and not data_info.get(name):
+                    bytes = answer_cmd[ind + 2]
+                    data_info[name] = [bytes, prev_date]
+            else:
+                pass  # error
 
-
+        print(data_info, answer_cmd)
+    exit()
