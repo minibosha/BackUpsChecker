@@ -24,11 +24,11 @@ class FileHelper:
             if name_comp and paths:
                 return name_comp, paths
             else:
-                FileHelper.work_file('Lower than 2 strings in file.\n1-computer name; 2, 3, 4,... - path (-s) to file', error=True)
+                FileHelper.work_file('Less than two lines in a file.\n1-computer name; 2, 3, 4,... - path (-s) to file', error=True)
                 exit(1)
         except (FileNotFoundError, ValueError):
             # Если файла нет, сохраняем ошибку, что его не было и мы его создали
-            FileHelper.work_file('File "filepaths_ch.txt" does not exist.\nScript make the file ""filepaths_ch.txt"".', error=True)
+            FileHelper.work_file('File "filepaths_ch.txt" does not exist.\nThe script created the file ""filepaths_ch.txt"".', error=True)
             # Создаём файл для записи
             with open(cls.file_log_path, 'w') as m_f:
                 m_f.write('')

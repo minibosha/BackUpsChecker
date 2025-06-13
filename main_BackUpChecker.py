@@ -46,16 +46,17 @@ while True:
                     bytes = answer_cmd[ind + 2]
                     data_info[name] = [bytes, prev_date]
 
-        # Проверяем что есть файл и его память, иначе выдаём ошибку что копии нет или файл слишком маленький
+        # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
         if len(data_info) < 2:
-            error_log = ['No files for today or tomorrow!!!']
+            error_log = ['There are no files for today or tomorrow.']
 
         # Проверяем что файл не битый
 
         # Выдаём ошибки, если они есть
         if error_log:
-            pass
+            pass  # Кидаем в Error_feedback (comp_name)
         # Вычисляем дату следующей проверки (замедление работы кода при ожидании, вдруг есть)
 
         print(data_info)
+
     exit()
