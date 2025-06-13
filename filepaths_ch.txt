@@ -1,0 +1,2 @@
+Tester
+C:\Users\user10w\PycharmProjects\BackUpsChecker\checker

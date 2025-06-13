@@ -31,19 +31,31 @@ while True:
         curr_date, prev_date = get_dates()  # Получаем сегодняшнюю и вчерашнюю дату
         # Находим все файлы и их информацию
         for ind, word in enumerate(answer_cmd[:len(answer_cmd) - 3]):
+            # Проверяем данные по памяти
+            # Проверяем, что файл сегодняшний
             if word == curr_date:
-                # Добавляем имя файла и информацию о нём
+                # Добавляем имя файла и информацию о нём по дате
                 name = answer_cmd[ind + 3]
                 if name not in ['.', '..', '...']:
                     bytes = answer_cmd[ind + 2]
                     data_info[name] = [bytes, curr_date]
             elif word == prev_date:
+                # Проверяем что вдруг этот файл уже есть, но 'свежий'
                 name = answer_cmd[ind + 3]
                 if name not in ['.', '..', '...'] and not data_info.get(name):
                     bytes = answer_cmd[ind + 2]
                     data_info[name] = [bytes, prev_date]
-            else:
-                pass  # error
 
-        print(data_info, answer_cmd)
+        # Проверяем что есть файл и его память, иначе выдаём ошибку что копии нет или файл слишком маленький
+        if len(data_info) < 2:
+            error_log = ['No files for today or tomorrow!!!']
+
+        # Проверяем что файл не битый
+
+        # Выдаём ошибки, если они есть
+        if error_log:
+            pass
+        # Вычисляем дату следующей проверки (замедление работы кода при ожидании, вдруг есть)
+
+        print(data_info)
     exit()

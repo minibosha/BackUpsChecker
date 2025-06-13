@@ -1,7 +1,6 @@
 # Библиотека для ОС
 import os
 import subprocess
-import locale
 
 
 class CommandWorker:
