@@ -3,7 +3,7 @@ from datetime import date, timedelta
 # Скачиваем дополнительные файлы
 from File_helper import FileHelper
 from Command_worker import CommandWorker
-from Error_feedback import *
+from Error_feedback import ErrorFeedback
 
 
 ''' Функции '''
@@ -28,7 +28,6 @@ while True:
     ''' Получаем командой информацию о файлах в пути через dir '''
     for path in paths:
         answer_cmd = CommandWorker.command_get('dir ' + path).split()  # Получаем ответ от cmd
-        print(answer_cmd)
         curr_date, prev_date = get_dates()  # Получаем сегодняшнюю и вчерашнюю дату
         # Находим все файлы и их информацию
         for ind, word in enumerate(answer_cmd[:len(answer_cmd) - 3]):
@@ -99,20 +98,24 @@ while True:
 
         # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
         if len(data_info) < 1:
-            error_log = ['There are no files for today or tomorrow.']
-        for key, obj in data_info.items():
-            if obj[1] == curr_date or obj[1] == prev_date:
-                if obj[0] > 5242880:
-                    break  # Лог, что с этим файлом всё ок
-                else:
-                    print('error', key, obj)
-                    pass  # ОШИБКА, файл меньше нормы
+            error_log.append('There are no files for today or tomorrow.')
+        else:
+            for key, obj in data_info.items():
+                if obj[1] == curr_date or obj[1] == prev_date:
+                    if obj[0] > 5242880:
+                        files.work_file(f'{curr_date} check: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.')  # Лог, что с этим файлом всё ок
+                    else:
+                        er_txt = f'{curr_date} ERROR: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.'
+                        files.work_file(er_txt, error=True)  # Лог, что с этим файлом всё ок
+                        error_log.append(er_txt)
 
         # Проверяем что файл не битый
 
         # Выдаём ошибки, если они есть
         if error_log:
-            pass  # Кидаем в Error_feedback (comp_name)
+            errors = ErrorFeedback(name_comp, error_log)
+            errors.send_error()
+
         # Вычисляем дату следующей проверки (замедление работы кода при ожидании, вдруг есть)
 
         print(data_info)

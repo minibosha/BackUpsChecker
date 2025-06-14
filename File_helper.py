@@ -41,5 +41,6 @@ class FileHelper:
         if error:
             text = 'ERROR:\n' + text
         # Открываем файл для записи
-        with open(cls.file_work_path, 'w') as f:
+        with open(cls.file_work_path, 'a') as f:
             f.write(text)
+            f.write('\n')
