@@ -22,18 +22,7 @@ class CommandWorker:
                 encoding='CP866'
             )
             return result
-        except subprocess.CalledProcessError as e:
-            # Обработка ошибок выполнения команды
-            error_msg = f"Ошибка выполнения команды (код {e.returncode}):\n{e.output}"
-            print(error_msg)
-            return error_msg
-        except FileNotFoundError as e:
-            # Обработка случая, когда команда не найдена
-            error_msg = f"Команда не найдена: {e.filename}"
-            print(error_msg)
-            return error_msg
-        except Exception as e:
-            # Обработка всех остальных исключений
-            error_msg = f"Неизвестная ошибка: {str(e)}"
-            print(error_msg)
-            return error_msg
+        except (subprocess.CalledProcessError, FileNotFoundError, Exception) as e:
+            with open(os.path.abspath("work_log_ch.txt"), 'a') as file:
+                file.write(f'ERROR: COMMAND ERROR. {e}')
+            return ''
