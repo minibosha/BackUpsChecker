@@ -4,6 +4,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from File_helper import FileHelper
 import ssl
+import telebot
 
 
 class ErrorFeedback:
@@ -52,7 +53,20 @@ class ErrorFeedback:
 
     # Отправляем ошибку в тг-боте
     def tg_error(self):
-        pass
+        # Подключаем бота
+        TOKEN = '7894828943:AAGcbqqSmj1z-pXfO6tGlUPFKDE65LDk1gk'
+        Bot = telebot.TeleBot(TOKEN, parse_mode=None)
+        # Если нужно получить ID
+        '''
+        @Bot.message_handler(commands=['start'])
+        def get_id(message):
+            print(message.chat.id)
+        '''
+        # Выводим сообщения
+        IDS = [1181643061]
+        for ID in IDS:
+            Bot.send_message(ID, self.error_log_txt)
+
 
     def file_error(self, file):
         file.work_file(self.error_log_txt)
