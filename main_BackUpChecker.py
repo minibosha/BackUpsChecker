@@ -183,8 +183,5 @@ while True:
     sleep_time = min(seconds_until_next, MAX_SLEEP_SECONDS)
 
     if sleep_time > 0:
-        # Форматируем время для удобного отображения
-        hours = sleep_time // 3600
-        minutes = (sleep_time % 3600) // 60
         # Спим
         time.sleep(sleep_time)

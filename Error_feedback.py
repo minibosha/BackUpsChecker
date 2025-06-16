@@ -67,6 +67,5 @@ class ErrorFeedback:
         for ID in IDS:
             Bot.send_message(ID, self.error_log_txt)
 
-
     def file_error(self, file):
         file.work_file(self.error_log_txt)
