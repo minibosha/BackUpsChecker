@@ -1,23 +1,52 @@
 """ Скачиваем библиотеки """
-from datetime import date, timedelta
-# Скачиваем дополнительные файлы
-from File_helper import FileHelper
+import datetime
+import os
+import time
+
 from Command_worker import CommandWorker
 from Error_feedback import ErrorFeedback
+# Скачиваем дополнительные файлы
+from File_helper import FileHelper
 
 
 ''' Функции '''
+
+
+# Получаем нынешнюю и вчерашнюю дату
 def get_dates():
-    today = date.today()
-    yesterday = today - timedelta(days=1)
+    today = datetime.date.today()
+    yesterday = today - datetime.timedelta(days=1)
     today_str = today.strftime("%d.%m.%Y")
     yesterday_str = yesterday.strftime("%d.%m.%Y")
     return [today_str, yesterday_str]
 
 
+# Загружает время следующего выполнения из файла
+def load_next_run_time():
+    if not os.path.exists(CHECK_TIME_FILE):
+        return None
+    try:
+        with open(CHECK_TIME_FILE, "r", encoding="utf-8") as file:
+            return datetime.datetime.fromisoformat(file.read().strip())
+    except (ValueError, OSError) as error:
+        FileHelper().work_file(f"Ошибка чтения файла: {error}")
+        return None
+
+
+# Сохраняет время следующего выполнения в файл
+def save_next_run_time(next_run):
+    try:
+        with open(CHECK_TIME_FILE, "w", encoding="utf-8") as file:
+            file.write(next_run.isoformat())
+    except OSError as error:
+        FileHelper().work_file(f"Ошибка записи в файл: {error}")
+
+
 ''' Основная программа '''
-while True:
-    '''Переменные для программы '''
+
+
+def main_programm():
+    # Программные переменные
     data_info = {}  # {'name': ['bytes', 'date']}
     error_log = []
     files = FileHelper()  # Класс для быстрой работы с файлами
@@ -98,26 +127,64 @@ while True:
 
         # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
         if len(data_info) < 1:
-            error_log.append('There are no files for today or tomorrow.')
+            error_log.append(f'There are no files for today or tomorrow in path {path}.')
         else:
             for key, obj in data_info.items():
                 if obj[1] == curr_date or obj[1] == prev_date:
                     if obj[0] > 5242880:
-                        files.work_file(f'{curr_date} check: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.')  # Лог, что с этим файлом всё ок
+                        files.work_file(
+                            f'{curr_date} check: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.')  # Лог, что с этим файлом всё ок
                     else:
                         er_txt = f'{curr_date} ERROR: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.'
-                        files.work_file(er_txt, error=True)  # Лог, что с этим файлом всё ок
+                        files.work_file(er_txt, error=True)
                         error_log.append(er_txt)
 
         # Проверяем что файл не битый
 
-        # Выдаём ошибки, если они есть
-        if error_log:
-            errors = ErrorFeedback(name_comp, error_log)
-            errors.send_error()
+    # Выдаём ошибки, если они есть
+    if error_log:
+        errors = ErrorFeedback(name_comp, error_log)
+        errors.send_error()
 
-        # Вычисляем дату следующей проверки (замедление работы кода при ожидании, вдруг есть)
 
-        print(data_info)
+''' Проверка и запуск программы по времени '''
+# Конфигурационные константы
+CHECK_TIME_FILE = os.path.abspath("checkTimeForBC.txt")
+CHECK_INTERVAL_HOURS = 24
+MAX_SLEEP_SECONDS = 3600  # 1 час
+file = FileHelper()
 
-    exit()
+"""Основной цикл выполнения программы"""
+next_run = load_next_run_time()
+
+# Если время не загружено, выполняем задачу сразу
+if next_run is None:
+    file.work_file("Первоначальный запуск программы")
+    main_programm()
+    next_run = datetime.datetime.now() + datetime.timedelta(hours=CHECK_INTERVAL_HOURS)
+    save_next_run_time(next_run)
+
+file.work_file(f"Следующее выполнение запланировано на: {next_run}")
+
+while True:
+    current_time = datetime.datetime.now()
+
+    # Проверяем, настало ли время выполнения
+    if current_time >= next_run:
+        main_programm()  # Выполнение основной программы.
+
+        # Планируем следующее выполнение
+        next_run = next_run + datetime.timedelta(hours=CHECK_INTERVAL_HOURS)
+        save_next_run_time(next_run)
+        file.work_file(f"Следующее выполнение запланировано на: {next_run}")
+
+    # Рассчитываем время до следующей проверки
+    seconds_until_next = (next_run - current_time).total_seconds()
+    sleep_time = min(seconds_until_next, MAX_SLEEP_SECONDS)
+
+    if sleep_time > 0:
+        # Форматируем время для удобного отображения
+        hours = sleep_time // 3600
+        minutes = (sleep_time % 3600) // 60
+        # Спим
+        time.sleep(sleep_time)

@@ -20,6 +20,7 @@ class ErrorFeedback:
     def send_error(self):
         self.email_error()
         self.tg_error()
+        self.file_error(FileHelper())
 
     # Отправляем ошибку по почте
     def email_error(self):
@@ -52,3 +53,6 @@ class ErrorFeedback:
     # Отправляем ошибку в тг-боте
     def tg_error(self):
         pass
+
+    def file_error(self, file):
+        file.work_file(self.error_log_txt)
