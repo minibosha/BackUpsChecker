@@ -26,7 +26,7 @@ class FileHelper:
             if name_comp and paths:
                 return name_comp, paths
             else:
-                FileHelper.work_file('Less than two lines in a file.\n1-computer name; 2, 3, 4,... - path (-s) to file', error=True)
+                FileHelper.work_file('Less than two lines in a file "filepaths_ch.txt".\n1-computer name; 2, 3, 4,... - path (-s) to file', error=True)
                 exit(1)
         except (FileNotFoundError, ValueError):
             # Если файла нет, сохраняем ошибку, что его не было и мы его создали
