@@ -1,6 +1,7 @@
 # Библиотека для ОС
 import os
 import subprocess
+from sys import exit
 
 
 class CommandWorker:

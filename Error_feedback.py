@@ -5,6 +5,7 @@ from email.mime.text import MIMEText
 from File_helper import FileHelper
 import ssl
 import telebot
+from sys import exit
 
 
 class ErrorFeedback:

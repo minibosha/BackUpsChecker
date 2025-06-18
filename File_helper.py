@@ -1,5 +1,6 @@
 # Библиотека для получения пути к файлу
 from Command_worker import CommandWorker
+from sys import exit
 
 
 # Класс для работы с файлами
@@ -29,7 +30,7 @@ class FileHelper:
                 exit(1)
         except (FileNotFoundError, ValueError):
             # Если файла нет, сохраняем ошибку, что его не было и мы его создали
-            FileHelper.work_file('File "filepaths_ch.txt" does not exist.\nThe script created the file ""filepaths_ch.txt"".', error=True)
+            FileHelper.work_file('File "filepaths_ch.txt" does not exist.\nThe script created the file "filepaths_ch.txt".', error=True)
             # Создаём файл для записи
             with open(cls.file_log_path, 'w') as m_f:
                 m_f.write('')

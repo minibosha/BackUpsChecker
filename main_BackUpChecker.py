@@ -2,6 +2,7 @@
 import datetime
 import os
 import time
+from sys import exit
 
 from Command_worker import CommandWorker
 from Error_feedback import ErrorFeedback
@@ -50,10 +51,10 @@ def main_program():
     data_info = {}  # {'name': ['bytes', 'date']}
     error_log = []
     files = FileHelper()  # Класс для быстрой работы с файлами
-    path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
-    ''' Считываем данные с файла '''
+    ''' Считываем данные с файлов '''
     name_comp, paths = files.log_file()
+    path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
     ''' Получаем командой информацию о файлах в пути через dir '''
     for path in paths:
