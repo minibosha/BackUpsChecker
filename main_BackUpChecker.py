@@ -57,6 +57,7 @@ def main_program():
 
     ''' Получаем командой информацию о файлах в пути через dir '''
     for path in paths:
+        today_file: bool = False
         answer_cmd = CommandWorker.command_get('dir ' + path).split()  # Получаем ответ от cmd
         curr_date, prev_date = get_dates()  # Получаем сегодняшнюю и вчерашнюю дату
         # Находим все файлы и их информацию
@@ -94,6 +95,7 @@ def main_program():
                     # Сохраняем результат
                     if name and bytes and name not in ['.', '..', '...', '<DIR>']:
                         data_info[name] = [bytes, curr_date]
+                        today_file = True
             elif word == prev_date:
                 # Переменные нужные для программы
                 bytes = 0
@@ -131,12 +133,12 @@ def main_program():
             error_log.append(f'There are no files for today or tomorrow in path {path}.')
         else:
             for key, obj in data_info.items():
-                if obj[1] == curr_date or obj[1] == prev_date:
+                if obj[1] == curr_date or obj[1] == prev_date and not today_file:
                     if obj[0] > 5242880:
                         files.work_file(
                             f'{curr_date} check: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.')  # Лог, что с этим файлом всё ок
                     else:
-                        er_txt = f'{curr_date} ERROR: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.'
+                        er_txt = f'{curr_date} ERROR: The {key} file occupies {obj[0]} bytes of memory (<5Mb) and its creation date is {obj[1]}.'
                         files.work_file(er_txt, error=True)
                         error_log.append(er_txt)
 
