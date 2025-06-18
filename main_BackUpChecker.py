@@ -45,11 +45,12 @@ def save_next_run_time(next_run):
 ''' Основная программа '''
 
 
-def main_programm():
+def main_program():
     # Программные переменные
     data_info = {}  # {'name': ['bytes', 'date']}
     error_log = []
     files = FileHelper()  # Класс для быстрой работы с файлами
+    path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
     ''' Считываем данные с файла '''
     name_comp, paths = files.log_file()
@@ -139,7 +140,18 @@ def main_programm():
                         files.work_file(er_txt, error=True)
                         error_log.append(er_txt)
 
-        # Проверяем что файл не битый
+        # Проверяем что файл не битый через 7_zip
+        try:
+            for data_name in data_info.keys():
+                path_to_file_name = os.path.join(path, data_name)
+                command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
+                answer_7Zip = CommandWorker.command_get(command_for_7Zip)
+                if 'Everything is Ok' in answer_7Zip:
+                    files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
+                else:
+                    error_log.append(answer_7Zip)
+        except Exception as e:
+            files.work_file(f'UNKNOWN ERROR: {e}', error=True)
 
     # Выдаём ошибки, если они есть
     if error_log:
@@ -160,7 +172,7 @@ next_run = load_next_run_time()
 # Если время не загружено, выполняем задачу сразу
 if next_run is None:
     file.work_file("Первоначальный запуск программы")
-    main_programm()
+    main_program()
     next_run = datetime.datetime.now() + datetime.timedelta(hours=CHECK_INTERVAL_HOURS)
     save_next_run_time(next_run)
 
@@ -171,7 +183,7 @@ while True:
 
     # Проверяем, настало ли время выполнения
     if current_time >= next_run:
-        main_programm()  # Выполнение основной программы.
+        main_program()  # Выполнение основной программы.
 
         # Планируем следующее выполнение
         next_run = next_run + datetime.timedelta(hours=CHECK_INTERVAL_HOURS)

@@ -1,3 +1,2 @@
 Tester
-C:\Users\user10w\PycharmProjects\BackUpsChecker\checker
 C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real

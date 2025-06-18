@@ -1,11 +1,25 @@
-
-Следующее выполнение запланировано на: 2025-06-16 22:00:00.665774
-Следующее выполнение запланировано на: 2025-06-16 18:36:36.665774
-Email успешно отправлен.
-Errors from Tester
-: 
-1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker
-.
-2) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
-
 Следующее выполнение запланировано на: 2025-06-17 18:36:36.665774
+7Zip, C:\Program Files\7-Zip\7z.exe - Everything is Ok
+Следующее выполнение запланировано на: 2025-06-17 18:36:36.665774
+Следующее выполнение запланировано на: 2025-06-17 18:36:36.665774
+18.06.2025 check: The test_bck_2025-06-14 14-03.zip file occupies 182548909 bytes of memory and its creation date is 18.06.2025.
+18.06.2025 check: The test_bck_2025-06-14 14-07.zip file occupies 257247044 bytes of memory and its creation date is 17.06.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real - Everything is Ok
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real - Everything is Ok
+Следующее выполнение запланировано на: 2025-06-17 18:36:36.665774
+18.06.2025 check: The test_bck_2025-06-14 14-03.zip file occupies 182548909 bytes of memory and its creation date is 18.06.2025.
+18.06.2025 check: The test_bck_2025-06-14 14-07.zip file occupies 257247044 bytes of memory and its creation date is 17.06.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-03.zip - Everything is Ok
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-07.zip - Everything is Ok
+Следующее выполнение запланировано на: 2025-06-17 18:36:36.665774
+18.06.2025 check: The test_bck_2025-06-14 14-03.zip file occupies 182548909 bytes of memory and its creation date is 18.06.2025.
+18.06.2025 check: The test_bck_2025-06-14 14-07.zip file occupies 257247044 bytes of memory and its creation date is 17.06.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-03.zip - Everything is Ok
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-07.zip - Everything is Ok
+Следующее выполнение запланировано на: 2025-06-18 18:36:36.665774
+Следующее выполнение запланировано на: 2025-06-17 18:36:36.665774
+18.06.2025 check: The test_bck_2025-06-14 14-03.zip file occupies 182548909 bytes of memory and its creation date is 18.06.2025.
+18.06.2025 check: The test_bck_2025-06-14 14-07.zip file occupies 257247044 bytes of memory and its creation date is 17.06.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-03.zip - Everything is Ok
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-07.zip - Everything is Ok
+Следующее выполнение запланировано на: 2025-06-18 18:36:36.665774
