@@ -64,7 +64,7 @@ class ErrorFeedback:
             print(message.chat.id)
         '''
         # Выводим сообщения
-        IDS = [1181643061]
+        IDS = [1181643061, 968066585]
         for ID in IDS:
             Bot.send_message(ID, self.error_log_txt)
 
