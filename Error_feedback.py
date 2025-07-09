@@ -1,10 +1,15 @@
 # Библиотеки для отправки ошибки
-import smtplib
+import telebot
+import ssl
+
+from File_helper import FileHelper
+
+# import email.mime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from File_helper import FileHelper
-import ssl
-import telebot
+# import smtplib
+from smtplib import SMTP_SSL
+# import sys
 from sys import exit
 
 
@@ -32,7 +37,7 @@ class ErrorFeedback:
             context = ssl.create_default_context()
 
             # Используем контекстный менеджер для автоматического закрытия соединения
-            with smtplib.SMTP_SSL("smtp.yandex.com", 465, context=context) as server:
+            with SMTP_SSL("smtp.yandex.com", 465, context=context) as server:
                 # Аутентификация
                 server.login("boldaevaleksandr@yandex.ru", "qsjanliarwuodpxq")
 
@@ -64,7 +69,10 @@ class ErrorFeedback:
             print(message.chat.id)
         '''
         # Выводим сообщения
-        IDS = [1181643061, 968066585]
+        # Рабочий
+        # IDS = [1181643061, 968066585]
+        # Тестирование
+        IDS = [1181643061]
         for ID in IDS:
             Bot.send_message(ID, self.error_log_txt)
 

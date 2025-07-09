@@ -1,7 +1,11 @@
 """ Скачиваем библиотеки """
-import datetime
-import os
-import time
+# import datetime
+from datetime import date, timedelta, datetime
+# import os
+from os import path
+# import time
+from time import sleep
+# import sys
 from sys import exit
 
 from Command_worker import CommandWorker
@@ -15,8 +19,8 @@ from File_helper import FileHelper
 
 # Получаем нынешнюю и вчерашнюю дату
 def get_dates():
-    today = datetime.date.today()
-    yesterday = today - datetime.timedelta(days=1)
+    today = date.today()
+    yesterday = today - timedelta(days=1)
     today_str = today.strftime("%d.%m.%Y")
     yesterday_str = yesterday.strftime("%d.%m.%Y")
     return [today_str, yesterday_str]
@@ -24,11 +28,11 @@ def get_dates():
 
 # Загружает время следующего выполнения из файла
 def load_next_run_time():
-    if not os.path.exists(CHECK_TIME_FILE):
+    if not path.exists(CHECK_TIME_FILE):
         return None
     try:
         with open(CHECK_TIME_FILE, "r", encoding="utf-8") as file:
-            return datetime.datetime.fromisoformat(file.read().strip())
+            return datetime.fromisoformat(file.read().strip())
     except (ValueError, OSError) as error:
         FileHelper().work_file(f"Ошибка чтения файла: {error}")
         return None
@@ -146,7 +150,7 @@ def main_program():
         # Проверяем что файл не битый через 7_zip
         try:
             for data_name in data_info.keys():
-                path_to_file_name = os.path.join(path, data_name)
+                path_to_file_name = path.join(path, data_name)
                 command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
                 answer_7Zip = CommandWorker.command_get(command_for_7Zip)
                 if 'Everything is Ok' in answer_7Zip:
@@ -157,6 +161,9 @@ def main_program():
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
 
     # Выдаём ошибки, если они есть
+    # Парсим данные
+    error_log = list(filter(bool, error_log))
+    # Проверяем что массив не пустой
     if error_log:
         errors = ErrorFeedback(name_comp, error_log)
         errors.send_error()
@@ -164,7 +171,7 @@ def main_program():
 
 ''' Проверка и запуск программы по времени '''
 # Конфигурационные константы
-CHECK_TIME_FILE = os.path.abspath("checkTimeForBC.txt")
+CHECK_TIME_FILE = path.abspath("checkTimeForBC.txt")
 CHECK_INTERVAL_HOURS = 24
 MAX_SLEEP_SECONDS = 3600  # 1 час
 file = FileHelper()
@@ -176,20 +183,21 @@ next_run = load_next_run_time()
 if next_run is None:
     file.work_file("Первоначальный запуск программы")
     main_program()
-    next_run = datetime.datetime.now() + datetime.timedelta(hours=CHECK_INTERVAL_HOURS)
+    next_run = datetime.now() + timedelta(hours=CHECK_INTERVAL_HOURS)
     save_next_run_time(next_run)
 
 file.work_file(f"Следующее выполнение запланировано на: {next_run}")
 
 while True:
-    current_time = datetime.datetime.now()
+    current_time = datetime.now()
 
     # Проверяем, настало ли время выполнения
     if current_time >= next_run:
         main_program()  # Выполнение основной программы.
 
         # Планируем следующее выполнение
-        next_run = next_run + datetime.timedelta(hours=CHECK_INTERVAL_HOURS)
+        next_run = datetime.now()
+        next_run = next_run + timedelta(hours=CHECK_INTERVAL_HOURS)
         save_next_run_time(next_run)
         file.work_file(f"Следующее выполнение запланировано на: {next_run}")
 
@@ -199,4 +207,4 @@ while True:
 
     if sleep_time > 0:
         # Спим
-        time.sleep(sleep_time)
+        sleep(sleep_time)

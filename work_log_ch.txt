@@ -56,3 +56,42 @@ Errors from Tester
 7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-09 (добавочная).zip - Everything is Ok
 7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочная).zip - Everything is Ok
 Следующее выполнение запланировано на: 2025-06-19 18:33:52.947213
+Следующее выполнение запланировано на: 2025-06-19 18:33:52.947213
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-06-20 18:33:52.947213
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-06-21 18:33:52.947213
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-06-22 18:33:52.947213
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-06-23 18:33:52.947213
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-06-24 18:33:52.947213
+Email успешно отправлен.
+Следующее выполнение запланировано на: 2025-06-24 18:33:52.947213
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-07-10 20:05:17.977272
