@@ -44,7 +44,12 @@ class ErrorFeedback:
                 # Формируем сообщение
                 msg = MIMEMultipart()
                 msg["From"] = "boldaevaleksandr@yandex.ru"
-                msg["To"] = "nnaill.ru@mail.ru"
+
+                # Рабочий
+                msg["To"] = "it@9062606.ru"
+                # Тестирование
+                # msg["To"] = "nnaill.ru@mail.ru"
+
                 msg["Subject"] = f'Backup Errors: {self.computer_name}'
 
                 # Добавляем текст сообщения
@@ -69,10 +74,12 @@ class ErrorFeedback:
             print(message.chat.id)
         '''
         # Выводим сообщения
+
         # Рабочий
-        # IDS = [1181643061, 968066585]
+        IDS = [1181643061, 968066585]
         # Тестирование
-        IDS = [1181643061]
+        # IDS = [1181643061]
+
         for ID in IDS:
             Bot.send_message(ID, self.error_log_txt)
 
