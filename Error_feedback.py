@@ -1,9 +1,10 @@
 # Библиотеки для отправки ошибки
-import telebot
-import ssl
-
 from File_helper import FileHelper
 
+# import ssl
+from ssl import create_default_context
+# import telebot
+from telebot import TeleBot
 # import email.mime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -34,7 +35,7 @@ class ErrorFeedback:
         file = FileHelper()
         try:
             # Создаем безопасное соединение
-            context = ssl.create_default_context()
+            context = create_default_context()
 
             # Используем контекстный менеджер для автоматического закрытия соединения
             with SMTP_SSL("smtp.yandex.com", 465, context=context) as server:
@@ -66,7 +67,7 @@ class ErrorFeedback:
     def tg_error(self):
         # Подключаем бота
         TOKEN = '7894828943:AAGcbqqSmj1z-pXfO6tGlUPFKDE65LDk1gk'
-        Bot = telebot.TeleBot(TOKEN, parse_mode=None)
+        Bot = TeleBot(TOKEN, parse_mode=None)
         # Если нужно получить ID
         '''
         @Bot.message_handler(commands=['start'])
@@ -80,8 +81,12 @@ class ErrorFeedback:
         # Тестирование
         # IDS = [1181643061]
 
-        for ID in IDS:
-            Bot.send_message(ID, self.error_log_txt)
+        try:
+            for ID in IDS:
+                Bot.send_message(ID, self.error_log_txt)
+        except Exception as e:
+            file = FileHelper()
+            file.work_file(f"Ошибка отправки телеграмм: {str(e)}")
 
     def file_error(self, file):
         file.work_file(self.error_log_txt)

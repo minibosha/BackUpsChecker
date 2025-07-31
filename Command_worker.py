@@ -29,4 +29,4 @@ class CommandWorker:
         except (subprocess.CalledProcessError, FileNotFoundError, Exception) as e:
             with open(path.abspath("work_log_ch.txt"), 'a') as file:
                 file.write(f'ERROR: COMMAND ERROR. {e}')
-            return ''
+            return f'ERROR: COMMAND ERROR. {e}'

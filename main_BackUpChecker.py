@@ -1,4 +1,9 @@
 """ Скачиваем библиотеки """
+# Скачиваем дополнительные файлы
+from Command_worker import CommandWorker
+from Error_feedback import ErrorFeedback
+from File_helper import FileHelper
+
 # import datetime
 from datetime import date, timedelta, datetime
 # import os
@@ -7,11 +12,6 @@ from os import path
 from time import sleep
 # import sys
 from sys import exit
-
-from Command_worker import CommandWorker
-from Error_feedback import ErrorFeedback
-# Скачиваем дополнительные файлы
-from File_helper import FileHelper
 
 
 ''' Функции '''
@@ -61,9 +61,9 @@ def main_program():
     path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
     ''' Получаем командой информацию о файлах в пути через dir '''
-    for path in paths:
+    for path_curr in paths:
         today_file: bool = False
-        answer_cmd = CommandWorker.command_get('dir ' + path).split()  # Получаем ответ от cmd
+        answer_cmd = CommandWorker.command_get('dir ' + path_curr).split()  # Получаем ответ от cmd
         curr_date, prev_date = get_dates()  # Получаем сегодняшнюю и вчерашнюю дату
         # Находим все файлы и их информацию
         for ind, word in enumerate(answer_cmd[:len(answer_cmd) - 3]):
@@ -135,7 +135,7 @@ def main_program():
 
         # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
         if len(data_info) < 1:
-            error_log.append(f'There are no files for today or tomorrow in path {path}.')
+            error_log.append(f'There are no files for today or tomorrow in path {path_curr}.')
         else:
             for key, obj in data_info.items():
                 if obj[1] == curr_date or obj[1] == prev_date and not today_file:
@@ -150,15 +150,17 @@ def main_program():
         # Проверяем что файл не битый через 7_zip
         try:
             for data_name in data_info.keys():
-                path_to_file_name = path.join(path, data_name)
-                command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
-                answer_7Zip = CommandWorker.command_get(command_for_7Zip)
-                if 'Everything is Ok' in answer_7Zip:
-                    files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
-                else:
-                    error_log.append(answer_7Zip)
+                if data_name.split(".")[-1] in ["zip", "rar", "gz", "7z"]:
+                    path_to_file_name = path.join(path_curr, data_name)
+                    command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
+                    answer_7Zip = CommandWorker.command_get(command_for_7Zip)
+                    if 'Everything is Ok' in answer_7Zip:
+                        files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
+                    else:
+                        error_log.append(answer_7Zip)
         except Exception as e:
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
+            error_log.append(e)
 
     # Выдаём ошибки, если они есть
     # Парсим данные
@@ -186,7 +188,7 @@ if next_run is None:
     next_run = datetime.now() + timedelta(hours=CHECK_INTERVAL_HOURS)
     save_next_run_time(next_run)
 
-file.work_file(f"Следующее выполнение запланировано на: {next_run}")
+    file.work_file(f"Следующее выполнение запланировано на: {next_run}")
 
 while True:
     current_time = datetime.now()
