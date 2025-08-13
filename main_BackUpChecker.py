@@ -147,9 +147,10 @@ def main_program():
                         files.work_file(er_txt, error=True)
                         error_log.append(er_txt)
 
-        # Проверяем что файл не битый через 7_zip
+        # Проверяем что файл не битый через 7_zip или акронис
         try:
             for data_name in data_info.keys():
+                # Файлы, которые поддерживает 7zip
                 if data_name.split(".")[-1] in ["zip", "rar", "gz", "7z"]:
                     path_to_file_name = path.join(path_curr, data_name)
                     command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
@@ -158,6 +159,15 @@ def main_program():
                         files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
                     else:
                         error_log.append(answer_7Zip)
+                # Проверка файлов акрониса
+                elif data_name.split(".")[-1] in ["tib", "tibx"]:
+                    path_to_file_name = path.join(path_curr, data_name)
+                    command_for_acronis = f'acrocmd validate backup --loc={path_to_file_name} --arc={data_name}'
+                    answer_acronis = CommandWorker.command_get(command_for_acronis)
+                    if 'completed successfully' in answer_acronis or 'завершено успешно' in answer_acronis:
+                        files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
+                    else:
+                        error_log.append(answer_acronis)
         except Exception as e:
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
             error_log.append(e)
