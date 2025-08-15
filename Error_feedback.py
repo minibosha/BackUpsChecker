@@ -47,9 +47,9 @@ class ErrorFeedback:
                 msg["From"] = "boldaevaleksandr@yandex.ru"
 
                 # Рабочий
-                # msg["To"] = "it@9062606.ru"
+                msg["To"] = "it@9062606.ru"
                 # Тестирование
-                msg["To"] = "nnaill.ru@mail.ru"
+                # msg["To"] = "nnaill.ru@mail.ru"
 
                 msg["Subject"] = f'Backup Errors: {self.computer_name}'
 
@@ -77,9 +77,9 @@ class ErrorFeedback:
         # Выводим сообщения
 
         # Рабочий
-        # IDS = [1181643061, 968066585]
+        IDS = [1181643061, 968066585]
         # Тестирование
-        IDS = [1181643061]
+        # IDS = [1181643061]
 
         try:
             for ID in IDS:

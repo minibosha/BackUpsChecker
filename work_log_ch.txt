@@ -160,3 +160,30 @@ Errors from Tester
 1) ERROR: COMMAND ERROR. Command '"C:\Program Files\7-Zip\7z.exe" t -p"123456" "C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\bck_1test 2025-07-09 16;47;27.zip"' returned non-zero exit status 2.
 
 Следующее выполнение запланировано на: 2025-08-01 21:10:34.334599
+15.08.2025 check: The test1123_2025_08_15_11_50_24_507F.TIB file occupies 71331843 bytes of memory and its creation date is 15.08.2025.
+ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test1123_2025_08_15_11_50_24_507F.TIB --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.Email успешно отправлен.
+Errors from Tester
+: 
+1) ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test1123_2025_08_15_11_50_24_507F.TIB --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.
+
+Следующее выполнение запланировано на: 2025-08-16 18:32:16.151179
+15.08.2025 check: The test1123_2025_08_15_11_50_24_507F.TIB file occupies 71331843 bytes of memory and its creation date is 15.08.2025.
+ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.Email успешно отправлен.
+Errors from Tester
+: 
+1) ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.
+
+Следующее выполнение запланировано на: 2025-08-16 18:34:05.400867
+15.08.2025 check: The test1123_2025_08_15_11_50_24_507F.TIB file occupies 71331843 bytes of memory and its creation date is 15.08.2025.
+ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\ --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.Email успешно отправлен.
+Errors from Tester
+: 
+1) ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\ --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.
+
+Следующее выполнение запланировано на: 2025-08-16 18:35:00.080635
+15.08.2025 check: The test1123_2025_08_15_11_50_24_507F.TIB file occupies 71331843 bytes of memory and its creation date is 15.08.2025.
+ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\ --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.acronis, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test1123_2025_08_15_11_50_24_507F.TIB - Everything is Ok
+Следующее выполнение запланировано на: 2025-08-16 18:38:23.127770
+15.08.2025 check: The test1123_2025_08_15_11_50_24_507F.TIB file occupies 71331843 bytes of memory and its creation date is 15.08.2025.
+ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\ --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.acronis, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test1123_2025_08_15_11_50_24_507F.TIB - Everything is Ok
+Следующее выполнение запланировано на: 2025-08-16 18:39:38.548893

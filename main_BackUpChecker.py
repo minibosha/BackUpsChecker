@@ -13,7 +13,6 @@ from time import sleep
 # import sys
 from sys import exit
 
-
 ''' Функции '''
 
 
@@ -160,9 +159,9 @@ def main_program():
                     else:
                         error_log.append(answer_7Zip)
                 # Проверка файлов акрониса
-                elif data_name.split(".")[-1] in ["tib", "tibx"]:
+                elif data_name.split(".")[-1] in ["tib", "tibx", "TIB", "TIBX"]:
                     path_to_file_name = path.join(path_curr, data_name)
-                    command_for_acronis = f'acrocmd validate backup --loc={path_to_file_name} --arc={data_name}'
+                    command_for_acronis = f'acrocmd validate backup --loc={path_curr}\ --arc={data_name}'
                     answer_acronis = CommandWorker.command_get(command_for_acronis)
                     if 'completed successfully' in answer_acronis or 'завершено успешно' in answer_acronis:
                         files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
