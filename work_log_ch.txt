@@ -187,3 +187,9 @@ ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\Py
 15.08.2025 check: The test1123_2025_08_15_11_50_24_507F.TIB file occupies 71331843 bytes of memory and its creation date is 15.08.2025.
 ERROR: COMMAND ERROR. Command 'acrocmd validate backup --loc=C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\ --arc=test1123_2025_08_15_11_50_24_507F.TIB' returned non-zero exit status 1.acronis, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test1123_2025_08_15_11_50_24_507F.TIB - Everything is Ok
 Следующее выполнение запланировано на: 2025-08-16 18:39:38.548893
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-08-20 15:39:54.752737
