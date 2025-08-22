@@ -173,12 +173,19 @@ def main_program():
                     command_for_macrimum_reflect = f'mrverify.exe "{path_to_file_name}" --password "{password_7_zip}"'
                     answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
                     if 'Verification succeeded' in answer_macrimum_reflect or 'Проверка прошла успешно' in answer_macrimum_reflect:
-                        files.work_file(f'mr ok')
+                        files.work_file(f'mr ok {answer_macrimum_reflect}')
                     else:
                         error_log.append(answer_macrimum_reflect)
         except Exception as e:
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
             error_log.append(e)
+
+
+    # Проверка времени в консоль
+    # ping google.com -t
+    print(CommandWorker.command_get("ping google.com -t"))
+
+
 
     # Выдаём ошибки, если они есть
     # Парсим данные
