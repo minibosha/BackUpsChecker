@@ -223,3 +223,21 @@ Errors from Tester
 1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
 
 —ледующее выполнение запланировано на: 2025-08-23 15:43:40.076749
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+—ледующее выполнение запланировано на: 2025-08-23 15:46:31.199900
+26.08.2025 check: The test_bck_2025-06-14 14-10 (добавочна€).zip file occupies 16295455 bytes of memory and its creation date is 26.08.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочна€).zip - Everything is Ok
+—ледующее выполнение запланировано на: 2025-08-27 23:32:52.727233
+26.08.2025 check: The test_bck_2025-06-14 14-10 (добавочна€).zip file occupies 16295455 bytes of memory and its creation date is 26.08.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочна€).zip - Everything is Ok
+—ледующее выполнение запланировано на: 2025-08-27 23:34:56.592949
+26.08.2025 check: The test_bck_2025-06-14 14-10 (добавочна€).zip file occupies 16295455 bytes of memory and its creation date is 26.08.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочна€).zip - Everything is Ok
+—ледующее выполнение запланировано на: 2025-08-27 23:36:46.652922
+26.08.2025 check: The test_bck_2025-06-14 14-10 (добавочна€).zip file occupies 16295455 bytes of memory and its creation date is 26.08.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочна€).zip - Everything is Ok
+—ледующее выполнение запланировано на: 2025-08-27 23:54:47.079937

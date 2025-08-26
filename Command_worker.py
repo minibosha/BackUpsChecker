@@ -20,23 +20,32 @@ class CommandWorker:
         timeout_seconds = 15  # 5 минут
 
         try:
-            # Создаем процесс с подключенными каналами ввода/вывода
+            # Создаем процесс
             process = subprocess.Popen(
                 command,
                 shell=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
-                encoding='CP866'
+                encoding='CP866',
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
             )
 
             # Ждем завершения процесса с таймаутом
             stdout, _ = process.communicate(timeout=timeout_seconds)
 
+
+
+            #  ОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладка
+            print(stdout)
+
+
+
             # Проверяем код возврата
             if process.returncode != 0:
-                raise subprocess.CalledProcessError(process.returncode, command, output=stdout)
+                return f'ERROR: COMMAND FAILED WITH CODE {process.returncode}.\nOutput: {stdout}'
 
+            # Возвращаем результат
             return stdout
 
         except subprocess.TimeoutExpired:
@@ -44,25 +53,19 @@ class CommandWorker:
             error_msg = f"TIME ERROR: command {command} TOO MUCH TIME TO WAIT"
 
             try:
-                if 'process' in locals():
-                    # На Windows используем taskkill для принудительного завершения процесса
-                    subprocess.run(f"taskkill /F /PID {process.pid}",
-                                   shell=True,
-                                   capture_output=True,
-                                   timeout=10)
-            except (subprocess.TimeoutExpired, subprocess.SubprocessError):
-                # Если не удалось завершить через taskkill, пробуем альтернативный метод
-                try:
-                    # Используем ctypes для вызова Windows API
-                    kernel32 = ctypes.windll.kernel32
-                    handle = kernel32.OpenProcess(1, False, process.pid)
-                    kernel32.TerminateProcess(handle, -1)
-                    kernel32.CloseHandle(handle)
-                except:
-                    # Если все методы не сработали, просто продолжаем
-                    pass
-            finally:
-                return error_msg
+                if 'process' in locals() and process.poll() is None:
+                    # Завершаем весь процесс и его потомков
+                    subprocess.run(f"taskkill /F /T /PID {process.pid}",
+                                  shell=True,
+                                  capture_output=True,
+                                  timeout=10)
+            except Exception as e:
+                error_msg += f"\nERROR TASKKILL: {e}"
 
-        except (subprocess.CalledProcessError, FileNotFoundError, Exception) as e:
-            return f'ERROR: COMMAND ERROR. {e}'
+            # Возвращаем все ошибки
+            return error_msg
+
+        except FileNotFoundError as e:
+            return f'ERROR: COMMAND NOT FOUND. {e}'
+        except Exception as e:
+            return f'ERROR: UNEXPECTED ERROR. {e}'
