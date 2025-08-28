@@ -170,7 +170,7 @@ def main_program():
                 # Проверка файлов macrimum reflect
                 elif data_name.split(".")[-1] in ["mrimg", "mrbakx"]:
                     path_to_file_name = path.join(path_curr, data_name)
-                    command_for_macrimum_reflect = f'mrverify.exe "{path_to_file_name}" --password "{password_7_zip}"'
+                    command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
                     answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
 
 
@@ -193,7 +193,7 @@ def main_program():
     #  ОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладка
     # Проверка времени в консоль
     # ping google.com -t
-    # print(CommandWorker.command_get("ping google.com -t"))
+    print(CommandWorker.command_get("ping google.com -t"))
 
 
 
