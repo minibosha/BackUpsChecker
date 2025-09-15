@@ -198,7 +198,7 @@ MAX_SLEEP_SECONDS = 3600  # 1 час
 file = FileHelper()
 
 ''' Проверка, что это первый запуск программы '''
-CommandWorker.check_processes("main_BackUpChecker.exe")
+file.work_file("Программа запущена!")
 
 """Основной цикл выполнения программы"""
 next_run = load_next_run_time()
