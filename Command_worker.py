@@ -4,9 +4,9 @@ import ctypes
 import psutil
 
 # import os
-from os import path, getpid
+from os import path
 # import sys
-from sys import exit, executable, argv
+from sys import exit
 
 
 class CommandWorker:

@@ -1,3 +1,10 @@
 
 
 Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-09-16 20:13:27.881111
