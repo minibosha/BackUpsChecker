@@ -1,11 +1,12 @@
 # Библиотека для ОС
 import subprocess
 import ctypes
+import psutil
 
 # import os
-from os import path
+from os import path, getpid
 # import sys
-from sys import exit
+from sys import exit, executable
 
 
 class CommandWorker:
@@ -69,3 +70,21 @@ class CommandWorker:
             return f'ERROR: COMMAND NOT FOUND. {e}'
         except Exception as e:
             return f'ERROR: UNEXPECTED ERROR. {e}'
+
+    @staticmethod
+    def check_processes(target_name: str) -> None:
+        current_pid = getpid()
+
+        # Перебираем все запущенные процессы
+        for proc in psutil.process_iter(['pid', 'name']):
+            try:
+                # Проверяем имя процесса и исключаем текущий процесс
+                if proc.info['name'].lower() == target_name.lower() and proc.info['pid'] != current_pid:
+                    print("Программа уже запущена! Завершаем текущий экземпляр.")
+                    exit(0)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                # Игнорируем процессы, к которым нет доступа
+                continue
+
+        # Основной код программы
+        print("Программа запущена. Это первый экземпляр.")

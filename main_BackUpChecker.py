@@ -170,6 +170,7 @@ def main_program():
                 # Проверка файлов macrimum reflect
                 elif data_name.split(".")[-1] in ["mrimg", "mrbakx"]:
                     path_to_file_name = path.join(path_curr, data_name)
+                    # C:\Program Files (x86)\Acronis\CommandLineTool\acrocmd.exe
                     command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
                     answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
 
@@ -193,7 +194,7 @@ def main_program():
     #  ОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладка
     # Проверка времени в консоль
     # ping google.com -t
-    print(CommandWorker.command_get("ping google.com -t"))
+    # print(CommandWorker.command_get("ping google.com -t"))
 
 
 
@@ -212,6 +213,9 @@ CHECK_TIME_FILE = path.abspath("checkTimeForBC.txt")
 CHECK_INTERVAL_HOURS = 24
 MAX_SLEEP_SECONDS = 3600  # 1 час
 file = FileHelper()
+
+''' Проверка, что это первый запуск программы '''
+CommandWorker.check_processes("main_BackUpChecker.py")
 
 """Основной цикл выполнения программы"""
 next_run = load_next_run_time()
