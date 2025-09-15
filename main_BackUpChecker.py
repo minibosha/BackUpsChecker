@@ -173,14 +173,6 @@ def main_program():
                     # C:\Program Files (x86)\Acronis\CommandLineTool\acrocmd.exe
                     command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
                     answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
-
-
-
-                    #  ОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладка
-                    print(answer_macrimum_reflect)
-
-
-
                     if 'Verification succeeded' in answer_macrimum_reflect or 'Проверка прошла успешно' in answer_macrimum_reflect:
                         files.work_file(f'mr ok')
                     else:
@@ -188,15 +180,6 @@ def main_program():
         except Exception as e:
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
             error_log.append(e)
-
-
-
-    #  ОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладка
-    # Проверка времени в консоль
-    # ping google.com -t
-    # print(CommandWorker.command_get("ping google.com -t"))
-
-
 
     # Выдаём ошибки, если они есть
     # Парсим данные
@@ -215,7 +198,7 @@ MAX_SLEEP_SECONDS = 3600  # 1 час
 file = FileHelper()
 
 ''' Проверка, что это первый запуск программы '''
-CommandWorker.check_processes("main_BackUpChecker.py")
+CommandWorker.check_processes("main_BackUpChecker.exe")
 
 """Основной цикл выполнения программы"""
 next_run = load_next_run_time()

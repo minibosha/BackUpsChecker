@@ -35,13 +35,6 @@ class CommandWorker:
             # Ждем завершения процесса с таймаутом
             stdout, _ = process.communicate(timeout=timeout_seconds)
 
-
-
-            #  ОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладкаОткладка
-            print(stdout)
-
-
-
             # Проверяем код возврата
             if process.returncode != 0:
                 return f'ERROR: COMMAND FAILED WITH CODE {process.returncode}.\nOutput: {stdout}'
@@ -73,18 +66,17 @@ class CommandWorker:
 
     @staticmethod
     def check_processes(target_name: str) -> None:
-        current_pid = getpid()
+        try:
+            current_pid = getpid()
 
-        # Перебираем все запущенные процессы
-        for proc in psutil.process_iter(['pid', 'name']):
-            try:
-                # Проверяем имя процесса и исключаем текущий процесс
-                if proc.info['name'].lower() == target_name.lower() and proc.info['pid'] != current_pid:
-                    print("Программа уже запущена! Завершаем текущий экземпляр.")
-                    exit(0)
-            except (psutil.NoSuchProcess, psutil.AccessDenied):
-                # Игнорируем процессы, к которым нет доступа
-                continue
-
-        # Основной код программы
-        print("Программа запущена. Это первый экземпляр.")
+            # Перебираем все запущенные процессы
+            for proc in psutil.process_iter(['pid', 'name']):
+                try:
+                    # Проверяем имя процесса и исключаем текущий процесс
+                    if proc.info['name'].lower() == target_name.lower() and proc.info['pid'] != current_pid:
+                        exit(0)
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    # Игнорируем процессы, к которым нет доступа
+                    continue
+        except Exception as e:
+            pass

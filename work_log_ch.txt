@@ -256,3 +256,15 @@ Errors from Tester
 1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
 
 Следующее выполнение запланировано на: 2025-09-16 19:29:34.778768
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-09-16 19:37:13.492662
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-09-16 19:38:49.411897
