@@ -106,9 +106,6 @@ def main_program():
                         while '.' not in name and ind + ind_for_int < len(answer_cmd):
                             name += ' ' + answer_cmd[ind + ind_for_int]
                             ind_for_int += 1
-                            # Защита от бесконечного цикла - ограничиваем максимальное количество пропусков в имени
-                            if ind_for_int > 10**18:
-                                break
                     # Сохраняем результат
                     if name and bytes and name not in ['.', '..', '...', '<DIR>']:
                         data_info[name] = [bytes, curr_date]
