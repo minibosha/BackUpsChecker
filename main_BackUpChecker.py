@@ -16,6 +16,11 @@ from sys import exit
 ''' Функции '''
 
 
+# Ограничение числа в диапазоне
+def constrain(n: int, min_val: int, max_val: int) -> int:
+    return max(min_val, min(n, max_val))
+
+
 # Получаем нынешнюю и вчерашнюю дату
 def get_dates():
     today = date.today()
@@ -61,9 +66,15 @@ def main_program():
 
     ''' Получаем командой информацию о файлах в пути через dir '''
     for path_curr in paths:
+        data_info = {}  # Обнуляем информацию, чтобы не было ошибок с одинаковым названием файлов
+
         today_file: bool = False
         answer_cmd = CommandWorker.command_get('dir ' + path_curr).split()  # Получаем ответ от cmd
         curr_date, prev_date = get_dates()  # Получаем сегодняшнюю и вчерашнюю дату
+        # Проверяем что у нас хватает информации
+        if len(answer_cmd) < 3:
+            error_log.append(f"ERROR ANSWER CMD (DIR): {answer_cmd}")
+            continue
         # Находим все файлы и их информацию
         for ind, word in enumerate(answer_cmd[:len(answer_cmd) - 3]):
             # Проверяем данные по памяти
@@ -75,7 +86,7 @@ def main_program():
                 # Считываем кол-во бит в файле
                 ind_for_int = 2
                 dig_of_num = []
-                while answer_cmd[ind + ind_for_int].isdigit():
+                while ind + ind_for_int < len(answer_cmd) and answer_cmd[ind + ind_for_int].isdigit():
                     try:
                         dig_of_num.append(int(answer_cmd[ind + ind_for_int]))
                         ind_for_int += 1
@@ -87,15 +98,17 @@ def main_program():
                         bytes += dig_of_num[::-1][i] * (1000 ** i)  # Возводим в степень 1000 по индексу
                     # Получаем имя программы
                     name = answer_cmd[ind + ind_for_int]
-                    if '.' not in name:
+                    if '.' not in name and ind + ind_for_int + 1 < len(answer_cmd):
                         ind_for_int += 1
-                        while '.' not in name:
-                            if ind + ind_for_int >= len(answer_cmd):
-                                name = answer_cmd[ind + ind_for_int]
-                                break
-                            name += ' '
-                            name += answer_cmd[ind + ind_for_int]
+                        # Ограничиваем результат на случай
+                        ind_for_int = ind_for_int = constrain(ind_for_int, 2, len(answer_cmd) - ind - 1)
+
+                        while '.' not in name and ind + ind_for_int < len(answer_cmd):
+                            name += ' ' + answer_cmd[ind + ind_for_int]
                             ind_for_int += 1
+                            # Защита от бесконечного цикла - ограничиваем максимальное количество слов в имени
+                            if ind_for_int > 30:  # Максимум 30 слов для имени файла
+                                break
                     # Сохраняем результат
                     if name and bytes and name not in ['.', '..', '...', '<DIR>']:
                         data_info[name] = [bytes, curr_date]
@@ -107,7 +120,7 @@ def main_program():
                 # Считываем кол-во бит в файле
                 ind_for_int = 2
                 dig_of_num = []
-                while answer_cmd[ind + ind_for_int].isdigit():
+                while ind + ind_for_int < len(answer_cmd) and answer_cmd[ind + ind_for_int].isdigit():
                     try:
                         dig_of_num.append(int(answer_cmd[ind + ind_for_int]))
                         ind_for_int += 1
@@ -119,15 +132,17 @@ def main_program():
                         bytes += dig_of_num[::-1][i] * (1000 ** i)  # Возводим в степень 1000 по индексу
                     # Получаем имя программы
                     name = answer_cmd[ind + ind_for_int]
-                    if '.' not in name:
+                    if '.' not in name and ind + ind_for_int + 1 < len(answer_cmd):
                         ind_for_int += 1
-                        while '.' not in name:
-                            if ind + ind_for_int >= len(answer_cmd):
-                                name = answer_cmd[ind + ind_for_int]
-                                break
-                            name += ' '
-                            name += answer_cmd[ind + ind_for_int]
+                        # Ограничиваем результат на случай
+                        ind_for_int = ind_for_int = constrain(ind_for_int, 2, len(answer_cmd) - ind - 1)
+
+                        while '.' not in name and ind + ind_for_int < len(answer_cmd):
+                            name += ' ' + answer_cmd[ind + ind_for_int]
                             ind_for_int += 1
+                            # Защита от бесконечного цикла - ограничиваем максимальное количество слов в имени
+                            if ind_for_int > 30:  # Максимум 30 слов для имени файла
+                                break
                     # Сохраняем результат
                     if name and bytes and name not in ['.', '..', '...', '<DIR>'] and not data_info.get(name):
                         data_info[name] = [bytes, prev_date]
@@ -137,7 +152,7 @@ def main_program():
             error_log.append(f'There are no files for today or tomorrow in path {path_curr}.')
         else:
             for key, obj in data_info.items():
-                if obj[1] == curr_date or obj[1] == prev_date and not today_file:
+                if obj[1] == curr_date or (obj[1] == prev_date and not today_file):
                     if obj[0] > 5242880:
                         files.work_file(
                             f'{curr_date} check: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.')  # Лог, что с этим файлом всё ок
@@ -146,37 +161,41 @@ def main_program():
                         files.work_file(er_txt, error=True)
                         error_log.append(er_txt)
 
-        # Проверяем что файл не битый через 7_zip или акронис
+        # Проверяем что файл не битый через 7_zip, macrimum reflect или акронис
         try:
             for data_name in data_info.keys():
-                # Файлы, которые поддерживает 7zip
-                if data_name.split(".")[-1] in ["zip", "rar", "gz", "7z"]:
-                    path_to_file_name = path.join(path_curr, data_name)
-                    command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
-                    answer_7Zip = CommandWorker.command_get(command_for_7Zip)
-                    if 'Everything is Ok' in answer_7Zip:
-                        files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
-                    else:
-                        error_log.append(answer_7Zip)
-                # Проверка файлов акрониса
-                elif data_name.split(".")[-1] in ["tib", "tibx", "TIB", "TIBX"]:
-                    path_to_file_name = path.join(path_curr, data_name)
-                    command_for_acronis = f'acrocmd validate backup --loc={path_curr}\ --arc={data_name}'
-                    answer_acronis = CommandWorker.command_get(command_for_acronis)
-                    if 'completed successfully' in answer_acronis or 'завершено успешно' in answer_acronis:
-                        files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
-                    else:
-                        error_log.append(answer_acronis)
-                # Проверка файлов macrimum reflect
-                elif data_name.split(".")[-1] in ["mrimg", "mrbakx"]:
-                    path_to_file_name = path.join(path_curr, data_name)
-                    # C:\Program Files (x86)\Acronis\CommandLineTool\acrocmd.exe
-                    command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
-                    answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
-                    if 'Verification succeeded' in answer_macrimum_reflect or 'Проверка прошла успешно' in answer_macrimum_reflect:
-                        files.work_file(f'mr ok')
-                    else:
-                        error_log.append(answer_macrimum_reflect)
+                try:
+                    # Файлы, которые поддерживает 7zip
+                    if data_name.split(".")[-1] in ["zip", "rar", "gz", "7z"]:
+                        path_to_file_name = path.join(path_curr, data_name)
+                        command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
+                        answer_7Zip = CommandWorker.command_get(command_for_7Zip)
+                        if 'Everything is Ok' in answer_7Zip:
+                            files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
+                        else:
+                            error_log.append(answer_7Zip)
+                    # Проверка файлов акрониса
+                    elif data_name.split(".")[-1] in ["tib", "tibx", "TIB", "TIBX"]:
+                        path_to_file_name = path.join(path_curr, data_name)
+                        command_for_acronis = f'acrocmd validate backup --loc={path_curr}\ --arc={data_name}'
+                        answer_acronis = CommandWorker.command_get(command_for_acronis)
+                        if 'completed successfully' in answer_acronis or 'завершено успешно' in answer_acronis:
+                            files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
+                        else:
+                            error_log.append(answer_acronis)
+                    # Проверка файлов macrimum reflect
+                    elif data_name.split(".")[-1] in ["mrimg", "mrbakx"]:
+                        path_to_file_name = path.join(path_curr, data_name)
+                        # C:\Program Files (x86)\Acronis\CommandLineTool\acrocmd.exe
+                        command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
+                        answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
+                        if 'Verification succeeded' in answer_macrimum_reflect or 'Проверка прошла успешно' in answer_macrimum_reflect:
+                            files.work_file(f'mr ok')
+                        else:
+                            error_log.append(answer_macrimum_reflect)
+                except Exception as e:
+                    error_log.append(f"Error checking {data_name}: {str(e)}")
+                    continue
         except Exception as e:
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
             error_log.append(e)
