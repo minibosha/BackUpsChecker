@@ -107,7 +107,7 @@ def main_program():
                             name += ' ' + answer_cmd[ind + ind_for_int]
                             ind_for_int += 1
                     # Сохраняем результат
-                    if name and bytes and name not in ['.', '..', '...', '<DIR>']:
+                    if name and bytes and name not in ['.', '..', '...', '<DIR>'] and not name.split(".")[-1] != "xml":
                         data_info[name] = [bytes, curr_date]
                         today_file = True
             elif word == prev_date:
@@ -138,7 +138,7 @@ def main_program():
                             name += ' ' + answer_cmd[ind + ind_for_int]
                             ind_for_int += 1
                     # Сохраняем результат
-                    if name and bytes and name not in ['.', '..', '...', '<DIR>'] and not data_info.get(name):
+                    if name and bytes and name not in ['.', '..', '...', '<DIR>'] and not name.split(".")[-1] != "xml" and not data_info.get(name):
                         data_info[name] = [bytes, prev_date]
 
         # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
