@@ -157,36 +157,38 @@ def main_program():
 
         # Проверяем что файл не битый через 7_zip, macrimum reflect или акронис
         try:
-            for data_name in data_info.keys():
+            for data_name, obj in data_info.items():
                 try:
-                    # Файлы, которые поддерживает 7zip
-                    if data_name.split(".")[-1] in ["zip", "rar", "gz", "7z"]:
-                        path_to_file_name = path.join(path_curr, data_name)
-                        command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
-                        answer_7Zip = CommandWorker.command_get(command_for_7Zip)
-                        if 'Everything is Ok' in answer_7Zip:
-                            files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
-                        else:
-                            error_log.append(answer_7Zip)
-                    # Проверка файлов акрониса
-                    elif data_name.split(".")[-1] in ["tib", "tibx", "TIB", "TIBX"]:
-                        path_to_file_name = path.join(path_curr, data_name)
-                        command_for_acronis = f'acrocmd validate backup --loc={path_curr}\ --arc={data_name}'
-                        answer_acronis = CommandWorker.command_get(command_for_acronis)
-                        if 'completed successfully' in answer_acronis or 'завершено успешно' in answer_acronis:
-                            files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
-                        else:
-                            error_log.append(answer_acronis)
-                    # Проверка файлов macrimum reflect
-                    elif data_name.split(".")[-1] in ["mrimg", "mrbakx"]:
-                        path_to_file_name = path.join(path_curr, data_name)
-                        # C:\Program Files (x86)\Acronis\CommandLineTool\acrocmd.exe
-                        command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
-                        answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
-                        if 'Verification succeeded' in answer_macrimum_reflect or 'Проверка прошла успешно' in answer_macrimum_reflect:
-                            files.work_file(f'mr ok')
-                        else:
-                            error_log.append(answer_macrimum_reflect)
+                    # Проверка, что это сегодняшний файл
+                    if obj[1] == curr_date or (obj[1] == prev_date and not today_file):
+                        # Файлы, которые поддерживает 7zip
+                        if data_name.split(".")[-1] in ["zip", "rar", "gz", "7z"]:
+                            path_to_file_name = path.join(path_curr, data_name)
+                            command_for_7Zip = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
+                            answer_7Zip = CommandWorker.command_get(command_for_7Zip)
+                            if 'Everything is Ok' in answer_7Zip:
+                                files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
+                            else:
+                                error_log.append(answer_7Zip)
+                        # Проверка файлов акрониса
+                        elif data_name.split(".")[-1] in ["tib", "tibx", "TIB", "TIBX"]:
+                            path_to_file_name = path.join(path_curr, data_name)
+                            command_for_acronis = f'acrocmd validate backup --loc={path_curr}\ --arc={data_name}'
+                            answer_acronis = CommandWorker.command_get(command_for_acronis)
+                            if 'completed successfully' in answer_acronis or 'завершено успешно' in answer_acronis:
+                                files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
+                            else:
+                                error_log.append(answer_acronis)
+                        # Проверка файлов macrimum reflect
+                        elif data_name.split(".")[-1] in ["mrimg", "mrbakx"]:
+                            path_to_file_name = path.join(path_curr, data_name)
+                            # C:\Program Files (x86)\Acronis\CommandLineTool\acrocmd.exe
+                            command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
+                            answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
+                            if 'Verification succeeded' in answer_macrimum_reflect or 'Проверка прошла успешно' in answer_macrimum_reflect:
+                                files.work_file(f'mr ok')
+                            else:
+                                error_log.append(answer_macrimum_reflect)
                 except Exception as e:
                     error_log.append(f"Error checking {data_name}: {str(e)}")
                     continue
