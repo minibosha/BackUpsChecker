@@ -18,7 +18,7 @@ class CommandWorker:
     # Отправка и возврат ответа от командной строки
     @staticmethod
     def command_get(command: str) -> str:
-        timeout_seconds = 3600  # 60 минут = 3600 секунд
+        timeout_seconds = 5400  # 90 минут = 5400 секунд
 
         try:
             # Создаем процесс

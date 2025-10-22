@@ -13,6 +13,15 @@ from smtplib import SMTP_SSL
 # import sys
 from sys import exit
 
+# Библиотеки, чтобы скрыть важные данные
+from dotenv import load_dotenv
+from os import getenv
+from json import loads
+
+
+# Подгрузка токена бота и его создание
+load_dotenv()
+
 
 class ErrorFeedback:
     def __init__(self, computer_name: str, error_logs: list) -> None:
@@ -40,16 +49,16 @@ class ErrorFeedback:
             # Используем контекстный менеджер для автоматического закрытия соединения
             with SMTP_SSL("smtp.yandex.com", 465, context=context) as server:
                 # Аутентификация
-                server.login("boldaevaleksandr@yandex.ru", "qsjanliarwuodpxq")
+                server.login(getenv('MAIL_FROM'), getenv('MAIL_PASSWORD'))
 
                 # Формируем сообщение
                 msg = MIMEMultipart()
-                msg["From"] = "boldaevaleksandr@yandex.ru"
+                msg["From"] = getenv('MAIL_FROM')
 
                 # Рабочий
-                # msg["To"] = "it@9062606.ru"
+                # msg["To"] = getenv('MAIL_TO')
                 # Тестирование
-                msg["To"] = "nnaill.ru@mail.ru"
+                msg["To"] = getenv('MAIL_TO_TEST')
 
                 msg["Subject"] = f'Backup Errors: {self.computer_name}'
 
@@ -66,22 +75,24 @@ class ErrorFeedback:
     # Отправляем ошибку в тг-боте
     def tg_error(self):
         # Подключаем бота
-        TOKEN = '7894828943:AAGcbqqSmj1z-pXfO6tGlUPFKDE65LDk1gk'
+        TOKEN = getenv('TOKEN')
         Bot = TeleBot(TOKEN, parse_mode=None)
-        # Если нужно получить ID
+
         '''
+        # Если нужно получить ID
+        
         @Bot.message_handler(commands=['start'])
         def get_id(message):
             print(message.chat.id)
         '''
+
         # Выводим сообщения
-
-        # Рабочий
-        # IDS = [1181643061, 968066585]
-        # Тестирование
-        IDS = [1181643061]
-
         try:
+            # Рабочий
+            # IDS = loads(getenv('IDS'))
+            # Тестирование
+            IDS = loads(getenv('TEST_IDS'))
+
             for ID in IDS:
                 Bot.send_message(ID, self.error_log_txt)
         except Exception as e:
