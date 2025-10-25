@@ -24,14 +24,18 @@ load_dotenv()
 
 
 class ErrorFeedback:
-    def __init__(self, computer_name: str, error_logs: list) -> None:
+    def __init__(self, computer_name: str, error_logs: list, name_paths_error_log: list) -> None:
         self.computer_name = computer_name
         self.error_logs = error_logs
+
+        # Гарантируем одинаковую длину списков
+        while len(name_paths_error_log) < len(error_logs):
+            name_paths_error_log.append(None)
 
         # Формируем текст сообщения с ошибками
         self.error_log_txt = f'Errors from {self.computer_name}: \n'
         for ind, er in enumerate(error_logs):
-            self.error_log_txt += f'{ind + 1}) {er}\n'
+            self.error_log_txt += f'{ind + 1}) path name: {name_paths_error_log[ind]}:\n{er}\n'
 
     # Отправляем ошибки
     def send_error(self):
