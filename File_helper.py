@@ -112,7 +112,7 @@ class FileHelper:
             # Нет файла, выводим информацию о том что должно быть в файле и создаём файл
             cls.work_file('ERROR in "passwordFor7zip_ch.txt": There is no file. Line 1 is the path to 7_zip, line 2 is the password for the archive. The file was created under the name "passwordFor7zip_ch.txt".', error=True)
             with open(cls.pass_7z, 'w') as f:
-                f.write('Path to 7Zip/n')
+                f.write('Path to 7Zip\n')
                 f.write('Password for archives')
             # Выходим из программы при ошибке
             exit(1)
