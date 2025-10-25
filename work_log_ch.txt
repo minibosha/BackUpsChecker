@@ -8,3 +8,379 @@ Errors from Tester
 1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
 
 Следующее выполнение запланировано на: 2025-09-16 20:13:27.881111
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-09-16 20:17:04.340013
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-09-16 20:24:21.100815
+Программа запущена!
+Email успешно отправлен.
+Программа запущена!
+Программа запущена!
+Программа запущена!
+Программа запущена!
+04.10.2025 check: The test_bck_2025-06-14 14-08 (добавочная).zip file occupies 16299484 bytes of memory and its creation date is 03.10.2025.
+Email успешно отправлен.
+Errors from Tester
+: 
+1) ERROR: COMMAND FAILED WITH CODE 2.
+Output: 
+7-Zip 25.01 (x64) : Copyright (c) 1999-2025 Igor Pavlov : 2025-08-03
+
+Scanning the drive for archives:
+1 file, 16299484 bytes (16 MiB)
+
+Testing archive: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-08 (добавочная).zip
+--
+Path = C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-08 (добавочная).zip
+Type = zip
+Physical Size = 16299484
+
+ERROR: Wrong password : D_open\fsaver3.zip
+
+Sub items Errors: 1
+
+Archives with Errors: 1
+
+Sub items Errors: 1
+
+
+Следующее выполнение запланировано на: 2025-10-05 00:44:37.005014
+Программа запущена!
+04.10.2025 check: The test_bck_2025-06-14 14-10 (добавочная).zip file occupies 16295455 bytes of memory and its creation date is 04.10.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочная).zip - Everything is Ok
+Email успешно отправлен.
+Errors from Tester
+: 
+1) ERROR: COMMAND FAILED WITH CODE 2.
+Output: 
+7-Zip 25.01 (x64) : Copyright (c) 1999-2025 Igor Pavlov : 2025-08-03
+
+Scanning the drive for archives:
+1 file, 16299484 bytes (16 MiB)
+
+Testing archive: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-08 (добавочная).zip
+--
+Path = C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-08 (добавочная).zip
+Type = zip
+Physical Size = 16299484
+
+ERROR: Wrong password : D_open\fsaver3.zip
+
+Sub items Errors: 1
+
+Archives with Errors: 1
+
+Sub items Errors: 1
+
+
+Следующее выполнение запланировано на: 2025-10-05 00:57:28.726150
+Программа запущена!
+04.10.2025 check: The test_bck_2025-06-14 14-10 (добавочная).7z file occupies 16295653 bytes of memory and its creation date is 04.10.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочная).7z - Everything is Ok
+Следующее выполнение запланировано на: 2025-10-05 00:59:40.397008
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-13 21:56:46.951652
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-13 21:57:44.059664
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-13 21:58:00.125672
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-13 22:04:50.756569
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-14 00:22:11.810176
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-14 00:24:14.026777
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-14 00:27:32.549252
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-14 00:29:52.647842
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-14 00:30:52.728928
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-14 00:35:06.183310
+Программа запущена!
+ERROR:
+13.10.2025 ERROR: The testxml.rar file occupies 75 bytes of memory (<5Mb) and its creation date is 13.10.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\testxml.rar - Everything is Ok
+Email успешно отправлен.
+Errors from Tester
+: 
+1) 13.10.2025 ERROR: The testxml.rar file occupies 75 bytes of memory (<5Mb) and its creation date is 13.10.2025.
+
+Следующее выполнение запланировано на: 2025-10-14 00:36:08.829247
+Программа запущена!
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-14 00:36:57.771691
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-17 19:20:36.970827
+Программа запущена!
+16.10.2025 check: The test_bck_2025-06-14 14-10 (добавочная).zip file occupies 16295455 bytes of memory and its creation date is 16.10.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочная).zip - Everything is Ok
+Следующее выполнение запланировано на: 2025-10-17 19:21:40.130754
+Программа запущена!
+16.10.2025 check: The test_bck_2025-06-14 14-10 (добавочная).zip file occupies 16295455 bytes of memory and its creation date is 16.10.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочная).zip - Everything is Ok
+Следующее выполнение запланировано на: 2025-10-17 19:22:56.033946
+Программа запущена!
+16.10.2025 check: The test_bck_2025-06-14 14-08 (добавочная).zip file occupies 16299484 bytes of memory and its creation date is 15.10.2025.
+Email успешно отправлен.
+Errors from Tester
+: 
+1) ERROR: COMMAND FAILED WITH CODE 2.
+Output: 
+7-Zip 25.01 (x64) : Copyright (c) 1999-2025 Igor Pavlov : 2025-08-03
+
+Scanning the drive for archives:
+1 file, 16299484 bytes (16 MiB)
+
+Testing archive: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-08 (добавочная).zip
+--
+Path = C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-08 (добавочная).zip
+Type = zip
+Physical Size = 16299484
+
+ERROR: Wrong password : D_open\fsaver3.zip
+
+Sub items Errors: 1
+
+Archives with Errors: 1
+
+Sub items Errors: 1
+
+
+Следующее выполнение запланировано на: 2025-10-17 19:24:17.701967
+Программа запущена!
+16.10.2025 check: The test_bck_2025-06-14 14-10 (добавочная).zip file occupies 16295455 bytes of memory and its creation date is 16.10.2025.
+7Zip, C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real\test_bck_2025-06-14 14-10 (добавочная).zip - Everything is Ok
+Следующее выполнение запланировано на: 2025-10-17 19:24:42.998936
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-23 23:53:50.013207
+Программа запущена!
+Email успешно отправлен.
+Ошибка отправки телеграмм: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: chat not found
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-23 23:59:46.515595
+Программа запущена!
+Email успешно отправлен.
+Ошибка отправки телеграмм: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: chat not found
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-24 00:00:53.674590
+Программа запущена!
+Email успешно отправлен.
+Ошибка отправки телеграмм: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: chat not found
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-24 00:04:22.698461
+Программа запущена!
+Email успешно отправлен.
+Ошибка отправки телеграмм: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: chat not found
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-24 00:05:37.272246
+Программа запущена!
+Email успешно отправлен.
+Ошибка отправки телеграмм: A request to the Telegram API was unsuccessful. Error code: 400. Description: Bad Request: chat not found
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-24 00:06:13.525078
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester
+: 
+1) There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-24 00:09:45.219401
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: None: There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-26 21:02:31.031737
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: REAL!!!:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: ???:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker.
+
+Следующее выполнение запланировано на: 2025-10-26 21:04:20.823961
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: None:
+There are no files for today or tomorrow in path ???.
+
+Следующее выполнение запланировано на: 2025-10-26 21:05:03.200153
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: None:
+There are no files for today or tomorrow in path ???.
+
+Следующее выполнение запланировано на: 2025-10-26 21:15:10.278395
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: None:
+There are no files for today or tomorrow in path ???.
+
+Следующее выполнение запланировано на: 2025-10-26 21:16:22.378674
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: None:
+There are no files for today or tomorrow in path ???.
+
+Следующее выполнение запланировано на: 2025-10-26 21:18:17.564771
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: None:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: None:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker.
+
+Следующее выполнение запланировано на: 2025-10-26 21:25:51.986559
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: None:
+There are no files for today or tomorrow in path ???.
+
+Следующее выполнение запланировано на: 2025-10-26 21:37:09.725250
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: ABOBS:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: None:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker.
+
+Следующее выполнение запланировано на: 2025-10-26 21:37:37.402321
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: ABOBS:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+2) path name: ABOBS@@@@:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker.
+
+Следующее выполнение запланировано на: 2025-10-26 21:37:53.440700
+Программа запущена!
+Email успешно отправлен.
+Errors from Tester: 
+1) path name: C:\Users\user10w\PycharmProjects\BackUpsChecker\checker:
+There are no files for today or tomorrow in path C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real.
+
+Следующее выполнение запланировано на: 2025-10-26 21:38:16.654176

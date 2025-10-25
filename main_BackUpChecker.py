@@ -58,14 +58,15 @@ def main_program():
     # Программные переменные
     data_info = {}  # {'name': ['bytes', 'date']}
     error_log = []
+    name_paths_error_log = []
     files = FileHelper()  # Класс для быстрой работы с файлами
 
     ''' Считываем данные с файлов '''
-    name_comp, paths = files.log_file()
+    name_comp, paths, names_to_paths = files.log_file()
     path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
     ''' Получаем командой информацию о файлах в пути через dir '''
-    for path_curr in paths:
+    for ind_for_err_path, path_curr in enumerate(paths):
         data_info = {}  # Обнуляем информацию, чтобы не было ошибок с одинаковым названием файлов
 
         today_file: bool = False
@@ -74,6 +75,7 @@ def main_program():
         # Проверяем что у нас хватает информации
         if len(answer_cmd) < 3:
             error_log.append(f"ERROR ANSWER CMD (DIR): {answer_cmd}")
+            name_paths_error_log.append(names_to_paths[ind_for_err_path])
             continue
         # Находим все файлы и их информацию
         for ind, word in enumerate(answer_cmd[:len(answer_cmd) - 3]):
@@ -144,6 +146,7 @@ def main_program():
         # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
         if len(data_info) < 1:
             error_log.append(f'There are no files for today or tomorrow in path {path_curr}.')
+            name_paths_error_log.append(names_to_paths[ind_for_err_path])
         else:
             for key, obj in data_info.items():
                 if obj[1] == curr_date or (obj[1] == prev_date and not today_file):
@@ -154,6 +157,7 @@ def main_program():
                         er_txt = f'{curr_date} ERROR: The {key} file occupies {obj[0]} bytes of memory (<5Mb) and its creation date is {obj[1]}.'
                         files.work_file(er_txt, error=True)
                         error_log.append(er_txt)
+                        name_paths_error_log.append(names_to_paths[ind_for_err_path])
 
         # Проверяем что файл не битый через 7_zip, macrimum reflect или акронис
         try:
@@ -170,6 +174,7 @@ def main_program():
                                 files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
                             else:
                                 error_log.append(answer_7Zip)
+                                name_paths_error_log.append(names_to_paths[ind_for_err_path])
                         # Проверка файлов акрониса
                         elif data_name.split(".")[-1] in ["tib", "tibx", "TIB", "TIBX"]:
                             path_to_file_name = path.join(path_curr, data_name)
@@ -179,6 +184,7 @@ def main_program():
                                 files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
                             else:
                                 error_log.append(answer_acronis)
+                                name_paths_error_log.append(names_to_paths[ind_for_err_path])
                         # Проверка файлов macrimum reflect
                         elif data_name.split(".")[-1] in ["mrimg", "mrbakx"]:
                             path_to_file_name = path.join(path_curr, data_name)
@@ -186,22 +192,25 @@ def main_program():
                             command_for_macrimum_reflect = f'"C:\Program Files\Macrium\Reflect\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
                             answer_macrimum_reflect = CommandWorker.command_get(command_for_macrimum_reflect)
                             if 'Verification succeeded' in answer_macrimum_reflect or 'Проверка прошла успешно' in answer_macrimum_reflect:
-                                files.work_file(f'mr ok')
+                                files.work_file(f'MR, {path_to_file_name} - Everything is Ok')
                             else:
                                 error_log.append(answer_macrimum_reflect)
+                                name_paths_error_log.append(names_to_paths[ind_for_err_path])
                 except Exception as e:
                     error_log.append(f"Error checking {data_name}: {str(e)}")
+                    name_paths_error_log.append(names_to_paths[ind_for_err_path])
                     continue
         except Exception as e:
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
             error_log.append(e)
+            name_paths_error_log.append(names_to_paths[ind_for_err_path])
 
     # Выдаём ошибки, если они есть
     # Парсим данные
     error_log = list(filter(bool, error_log))
     # Проверяем что массив не пустой
     if error_log:
-        errors = ErrorFeedback(name_comp, error_log)
+        errors = ErrorFeedback(name_comp, error_log, name_paths_error_log)
         errors.send_error()
 
 
