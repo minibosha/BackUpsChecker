@@ -154,9 +154,9 @@ class ErrorFeedback:
                 msg["From"] = getenv('MAIL_FROM')
 
                 # Рабочий
-                msg["To"] = getenv('MAIL_TO')
+                # msg["To"] = getenv('MAIL_TO')
                 # Тестирование
-                # msg["To"] = getenv('MAIL_TO_TEST')
+                msg["To"] = getenv('MAIL_TO_TEST')
 
                 msg["Subject"] = f'Backup Errors: {self.computer_name}'
 
@@ -187,9 +187,9 @@ class ErrorFeedback:
         # Выводим сообщения
         try:
             # Рабочий
-            IDS = loads(getenv('IDS'))
+            # IDS = loads(getenv('IDS'))
             # Тестирование
-            # IDS = loads(getenv('TEST_IDS'))
+            IDS = loads(getenv('TEST_IDS'))
 
             for ID in IDS:
                 Bot.send_message(ID, self.error_log_txt)
