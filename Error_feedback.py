@@ -117,6 +117,57 @@ def mask_passwords(text: str) -> str:
     return masked_text
 
 
+# Парсим данные из .env в массив
+def parse_telegram_ids_from_string(ids_str: str) -> list:
+    """
+    Безопасно парсит список ID из строки.
+    Обрабатывает различные форматы:
+    - JSON: [12345, 23456, 34567]
+    - JSON в кавычках: "[12345, 23456, 34567]"
+    - CSV: 12345,23456,34567
+    - CSV с пробелами: 12345, 23456, 34567
+    """
+    if not ids_str or not ids_str.strip():
+        return []
+
+    ids_str = ids_str.strip()
+
+    # Убираем внешние кавычки если есть
+    if (ids_str.startswith('"') and ids_str.endswith('"')) or \
+            (ids_str.startswith("'") and ids_str.endswith("'")):
+        ids_str = ids_str[1:-1].strip()
+
+    # Пробуем парсить как JSON
+    try:
+        ids_list = loads(ids_str)
+        if isinstance(ids_list, list):
+            return [int(x) if isinstance(x, (int, str)) and str(x).isdigit() else x for x in ids_list]
+    except:
+        pass
+
+    # Если это не JSON, пробуем парсить как CSV
+    try:
+        # Убираем возможные квадратные скобки
+        ids_str = ids_str.strip('[]')
+
+        # Разбиваем по запятым, убираем пробелы
+        id_strings = [x.strip() for x in ids_str.split(',') if x.strip()]
+
+        # Преобразуем в числа где возможно
+        result = []
+        for id_str in id_strings:
+            # Убираем кавычки если есть
+            id_str = id_str.strip('"\'')
+
+            if id_str.isdigit():
+                result.append(int(id_str))
+            else:
+                result.append(id_str)
+        return result
+    except:
+        return []
+
+
 class ErrorFeedback:
     def __init__(self, computer_name: str, error_logs: list, name_paths_error_log: list) -> None:
         self.computer_name = computer_name
@@ -189,7 +240,7 @@ class ErrorFeedback:
             # Рабочий
             # IDS = loads(getenv('IDS'))
             # Тестирование
-            IDS = loads(getenv('TEST_IDS'))
+            IDS = parse_telegram_ids_from_string(getenv('TEST_IDS'))
 
             for ID in IDS:
                 Bot.send_message(ID, self.error_log_txt)
