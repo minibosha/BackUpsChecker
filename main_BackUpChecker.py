@@ -301,8 +301,7 @@ def main_program():
             # Добавляем ошибки файлов
             if error_log_ans:
                 error_log.extend(error_log_ans)
-
-            name_paths_error_log.extend(names_to_paths[ind_for_err_path])
+                name_paths_error_log.append(names_to_paths[ind_for_err_path])
         except Exception as e:
             files.work_file(f'UNKNOWN ERROR: {e}', error=True)
             error_log.append(e)
