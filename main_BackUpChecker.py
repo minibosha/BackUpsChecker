@@ -308,8 +308,6 @@ def main_program():
             error_log.append(e)
             name_paths_error_log.append(names_to_paths[ind_for_err_path])
 
-        print(error_log, error_log_ans)
-
     # Выдаём ошибки, если они есть
     # Парсим данные
     error_log = list(filter(bool, error_log))
