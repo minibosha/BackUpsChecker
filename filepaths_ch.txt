@@ -1,3 +1,7 @@
 Tester
 C:\Users\user10w\PycharmProjects\BackUpsChecker\checker_more_real
+a
 C:\Users\user10w\PycharmProjects\BackUpsChecker\checker
+b
+C:\Users\user10w\PycharmProjects\BackUpsChecker\no_files_there
+c
