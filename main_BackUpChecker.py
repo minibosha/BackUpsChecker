@@ -1,11 +1,13 @@
 """ Скачиваем библиотеки """
 import asyncio
+
 # import datetime
 from datetime import date, timedelta, datetime
 # import os
 from os import path
 # import time
 from time import sleep
+
 
 # Скачиваем дополнительные файлы
 from Command_worker import CommandWorker, AsyncCommandWorker
@@ -55,123 +57,93 @@ def save_next_run_time(next_run):
 ''' Ассинхронные функции '''
 
 
-async def check_single_file_async(
-        data_name: str,
-        obj: tuple,
-        path_curr: str,
-        curr_date: str,
-        prev_date: str,
-        today_file: bool,
-        password_7_zip: str,
-        path_to_7_zip: str,
-        files,
-        command_worker: AsyncCommandWorker,
-        semaphore: asyncio.Semaphore) -> tuple:
+async def check_single_file_async(file_info, command_worker, semaphore):
     """
-    Асинхронная версия проверки одного файла
-    Возвращает: (success, data_name, result) или (False, data_name, error)
+    Простая асинхронная проверка одного файла
+    file_info: кортеж (data_name, obj, path_curr, path_display_name, curr_date, prev_date, today_file, password_7_zip, path_to_7_zip, files)
     """
-    async with semaphore:  # Ограничиваем параллелизм
+    # Распаковываем все параметры
+    (data_name, obj, path_curr, path_display_name,
+     curr_date, prev_date, today_file,
+     password_7_zip, path_to_7_zip, files) = file_info
+
+    async with semaphore:
         try:
-            # Проверяем актуальность файла (ваша существующая логика)
-            if obj[1] == curr_date or (obj[1] == prev_date and not today_file):
-                path_to_file_name = path.join(path_curr, data_name)
-                extension = data_name.split(".")[-1].lower()
+            # Проверяем актуальность файла
+            if obj[1] != curr_date and not (obj[1] == prev_date and not today_file):
+                return None, None  # Файл не актуален
 
-                # 7zip файлы
-                if extension in ["zip", "rar", "gz", "7z"]:
-                    command = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
-                    result = await command_worker.command_get_async(command)
-                    if 'Everything is Ok' in result:
-                        files.work_file(f'7Zip, {path_to_file_name} - Everything is Ok')
-                        return (True, data_name, result)
-                    else:
-                        return (False, data_name, result)
+            path_to_file_name = path.join(path_curr, data_name)
+            extension = data_name.split(".")[-1].lower()
 
-                # Acronis файлы
-                elif extension in ["tib", "tibx", "TIB", "TIBX"]:
-                    command = f'acrocmd validate backup --loc={path_curr} --arc={data_name}'
-                    result = await command_worker.command_get_async(command)
-                    if 'completed successfully' in result or 'завершено успешно' in result:
-                        files.work_file(f'acronis, {path_to_file_name} - Everything is Ok')
-                        return (True, data_name, result)
-                    else:
-                        return (False, data_name, result)
+            # 7ZIP
+            if extension in ["zip", "rar", "gz", "7z"]:
+                command = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
+                result = await command_worker.command_get_async(command)
+                if 'Everything is Ok' in result:
+                    files.work_file(f'7Zip, {path_to_file_name} - OK')
+                    return None, None
+                return f"7Zip: {result}", path_display_name
 
-                # Macrium Reflect файлы
-                elif extension in ["mrimg", "mrbakx"]:
-                    command = f'"C:\\Program Files\\Macrium\\Reflect\\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
-                    result = await command_worker.command_get_async(command)
-                    if 'Verification succeeded' in result or 'Проверка прошла успешно' in result:
-                        files.work_file(f'MR, {path_to_file_name} - Everything is Ok')
-                        return (True, data_name, result)
-                    else:
-                        return (False, data_name, result)
+            # ACRONIS
+            elif extension in ["tib", "tibx", "TIB", "TIBX"]:
+                command = f'acrocmd validate backup --loc={path_curr} --arc={data_name}'
+                result = await command_worker.command_get_async(command)
+                success_patterns = ['completed successfully', 'завершено успешно']
+                if any(pattern in result for pattern in success_patterns):
+                    files.work_file(f'Acronis, {path_to_file_name} - OK')
+                    return None, None
+                return f"Acronis: {result}", path_display_name
 
-            # Файл не актуален для проверки
-            return (True, data_name, "File not relevant for today")
+            # MACRIUM
+            elif extension in ["mrimg", "mrbakx"]:
+                command = f'"C:\\Program Files\\Macrium\\Reflect\\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
+                result = await command_worker.command_get_async(command)
+                success_patterns = ['Verification succeeded', 'Проверка прошла успешно']
+                if any(pattern in result for pattern in success_patterns):
+                    files.work_file(f'Macrium, {path_to_file_name} - OK')
+                    return None, None
+                return f"Macrium: {result}", path_display_name
+
+            return None, None
 
         except Exception as e:
-            return (False, data_name, f"Error checking {data_name}: {str(e)}")
+            return f"Exception: {str(e)}", path_display_name
 
 
-async def check_backup_files_async(
-        data_info: dict,
-        path_curr: str,
-        curr_date: str,
-        prev_date: str,
-        today_file: bool,
-        password_7_zip: str,
-        path_to_7_zip: str,
-        files,
-        max_concurrent: int = 4) -> list:
+async def check_all_files_async(file_tasks):
     """
-    Асинхронная проверка всех файлов с ограничением параллелизма через семафор
-    Возвращает: error_log (список ошибок)
+    Проверяет все файлы с ограничением в 4 одновременные задачи
+    Возвращает: (error_log, path_log)
     """
-    error_log = []
-
-    # Создаем семафор для ограничения параллелизма
-    semaphore = asyncio.Semaphore(max_concurrent)
-    command_worker = AsyncCommandWorker(max_workers=max_concurrent)
+    semaphore = asyncio.Semaphore(4)
+    command_worker = AsyncCommandWorker(max_workers=4)
 
     try:
-        # Создаем задачи для всех файлов
+        # Создаем задачи
         tasks = []
-        for data_name, obj in data_info.items():
-            task = check_single_file_async(
-                data_name=data_name,
-                obj=obj,
-                path_curr=path_curr,
-                curr_date=curr_date,
-                prev_date=prev_date,
-                today_file=today_file,
-                password_7_zip=password_7_zip,
-                path_to_7_zip=path_to_7_zip,
-                files=files,
-                command_worker=command_worker,
-                semaphore=semaphore
-            )
+        for file_info in file_tasks:
+            task = check_single_file_async(file_info, command_worker, semaphore)
             tasks.append(task)
 
-        # Ждем завершения ВСЕХ задач
+        # Запускаем все задачи
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # Обрабатываем результаты
+        # Собираем ошибки
+        error_log = []
+        path_log = []
+
         for result in results:
             if isinstance(result, Exception):
-                # Обработка исключений из gather
-                error_log.append(f"Task failed with exception: {str(result)}")
-                continue
+                error_log.append(f"Task error: {str(result)}")
+                path_log.append("Unknown")
+            elif result[0] is not None:  # Есть ошибка
+                error_log.append(result[0])
+                path_log.append(result[1])
 
-            success, data_name, result_text = result
+        return error_log, path_log
 
-            if not success and "File not relevant for today" not in result_text:
-                error_log.append(result_text)
-
-        return error_log
     finally:
-        # Всегда освобождаем ресурсы
         command_worker.executor.shutdown(wait=True)
 
 
@@ -184,6 +156,7 @@ def main_program():
     error_log = []
     name_paths_error_log = []
     files = FileHelper()  # Класс для быстрой работы с файлами
+    async_tasks = []  # Класс для ассинхронной проверки всех файлов
 
     ''' Считываем данные с файлов '''
     name_comp, paths, names_to_paths = files.log_file()
@@ -256,6 +229,7 @@ def main_program():
                     # Получаем имя программы
                     name = answer_cmd[ind + ind_for_int]
                     if '.' not in name and ind + ind_for_int + 1 < len(answer_cmd):
+
                         ind_for_int += 1
                         # Ограничиваем результат на случай
                         ind_for_int = ind_for_int = constrain(ind_for_int, 2, len(answer_cmd) - ind - 1)
@@ -264,8 +238,7 @@ def main_program():
                             name += ' ' + answer_cmd[ind + ind_for_int]
                             ind_for_int += 1
                     # Сохраняем результат
-                    if name and bytes and name not in ['.', '..', '...', '<DIR>'] and name.split(".")[
-                        -1] != "xml" and not data_info.get(name):
+                    if name and bytes and name not in ['.', '..', '...', '<DIR>'] and name.split(".")[-1] != "xml" and not data_info.get(name):
                         data_info[name] = [bytes, prev_date]
 
         # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
@@ -284,28 +257,24 @@ def main_program():
                         error_log.append(er_txt)
                         name_paths_error_log.append(names_to_paths[ind_for_err_path])
 
-        # Проверяем что файл не битый через 7_zip, macrimum reflect или акронис
-        error_log_ans = []
-        try:
-            error_log_ans = asyncio.run(check_backup_files_async(
-                data_info=data_info,
-                path_curr=path_curr,
-                curr_date=curr_date,
-                prev_date=prev_date,
-                today_file=today_file,
-                password_7_zip=password_7_zip,
-                path_to_7_zip=path_to_7_zip,
-                files=files,
-                max_concurrent=4))  # Максимум 4 файла одновременно
+                # Собираем информацию для асинхронной проверки
+                file_info = (
+                    key, obj, path_curr, names_to_paths[ind_for_err_path],
+                    curr_date, prev_date, today_file,
+                    password_7_zip, path_to_7_zip, files
+                )
+                async_tasks.append(file_info)
 
-            # Добавляем ошибки файлов
-            if error_log_ans:
-                error_log.extend(error_log_ans)
-                name_paths_error_log.append(names_to_paths[ind_for_err_path])
+    # Асинхронно проверяем все файлы на наличие ошибок
+    if async_tasks:
+        try:
+            errors_async, paths_async = asyncio.run(check_all_files_async(async_tasks))
+            error_log.extend(errors_async)
+            name_paths_error_log.extend(paths_async)
         except Exception as e:
-            files.work_file(f'UNKNOWN ERROR: {e}', error=True)
-            error_log.append(e)
-            name_paths_error_log.append(names_to_paths[ind_for_err_path])
+            files.work_file(f'Async check failed: {e}', error=True)
+            error_log.append(str(e))
+            name_paths_error_log.append(names_to_paths[0])
 
     # Выдаём ошибки, если они есть
     # Парсим данные
