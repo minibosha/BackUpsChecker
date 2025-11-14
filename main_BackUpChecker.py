@@ -1,13 +1,11 @@
 """ Скачиваем библиотеки """
 import asyncio
-
 # import datetime
 from datetime import date, timedelta, datetime
 # import os
 from os import path
 # import time
 from time import sleep
-
 
 # Скачиваем дополнительные файлы
 from Command_worker import CommandWorker, AsyncCommandWorker
@@ -76,36 +74,42 @@ async def check_single_file_async(file_info, command_worker, semaphore):
             path_to_file_name = path.join(path_curr, data_name)
             extension = data_name.split(".")[-1].lower()
 
-            # 7ZIP
-            if extension in ["zip", "rar", "gz", "7z"]:
-                command = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
-                result = await command_worker.command_get_async(command)
-                if 'Everything is Ok' in result:
-                    files.work_file(f'7Zip, {path_to_file_name} - OK')
-                    return None, None
-                return f"7Zip: {result}", path_display_name
+            check = True
+            if len(data_name) >= 3:
+                if data_name[:2] == "BC" or data_name[:3] in ["BC:", "BC.", "BC_"]:
+                    check = False
 
-            # ACRONIS
-            elif extension in ["tib", "tibx", "TIB", "TIBX"]:
-                command = f'acrocmd validate backup --loc={path_curr} --arc={data_name}'
-                result = await command_worker.command_get_async(command)
-                success_patterns = ['completed successfully', 'завершено успешно']
-                if any(pattern in result for pattern in success_patterns):
-                    files.work_file(f'Acronis, {path_to_file_name} - OK')
-                    return None, None
-                return f"Acronis: {result}", path_display_name
+            if check:
+                # 7ZIP
+                if extension in ["zip", "rar", "gz", "7z"]:
+                    command = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
+                    result = await command_worker.command_get_async(command)
+                    if 'Everything is Ok' in result:
+                        files.work_file(f'7Zip, {path_to_file_name} - OK')
+                        return None, None
+                    return f"7Zip: {result}", path_display_name
 
-            # MACRIUM
-            elif extension in ["mrimg", "mrbakx"]:
-                command = f'"C:\\Program Files\\Macrium\\Reflect\\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
-                result = await command_worker.command_get_async(command)
-                success_patterns = ['Verification succeeded', 'Проверка прошла успешно']
-                if any(pattern in result for pattern in success_patterns):
-                    files.work_file(f'Macrium, {path_to_file_name} - OK')
-                    return None, None
-                return f"Macrium: {result}", path_display_name
+                # ACRONIS
+                elif extension in ["tib", "tibx", "TIB", "TIBX"]:
+                    command = f'acrocmd validate backup --loc={path_curr} --arc={data_name}'
+                    result = await command_worker.command_get_async(command)
+                    success_patterns = ['completed successfully', 'завершено успешно']
+                    if any(pattern in result for pattern in success_patterns):
+                        files.work_file(f'Acronis, {path_to_file_name} - OK')
+                        return None, None
+                    return f"Acronis: {result}", path_display_name
 
-            return None, None
+                # MACRIUM
+                elif extension in ["mrimg", "mrbakx"]:
+                    command = f'"C:\\Program Files\\Macrium\\Reflect\\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
+                    result = await command_worker.command_get_async(command)
+                    success_patterns = ['Verification succeeded', 'Проверка прошла успешно']
+                    if any(pattern in result for pattern in success_patterns):
+                        files.work_file(f'Macrium, {path_to_file_name} - OK')
+                        return None, None
+                    return f"Macrium: {result}", path_display_name
+
+                return None, None
 
         except Exception as e:
             return f"Exception: {str(e)}", path_display_name
@@ -238,7 +242,8 @@ def main_program():
                             name += ' ' + answer_cmd[ind + ind_for_int]
                             ind_for_int += 1
                     # Сохраняем результат
-                    if name and bytes and name not in ['.', '..', '...', '<DIR>'] and name.split(".")[-1] != "xml" and not data_info.get(name):
+                    if name and bytes and name not in ['.', '..', '...', '<DIR>'] and name.split(".")[
+                        -1] != "xml" and not data_info.get(name):
                         data_info[name] = [bytes, prev_date]
 
         # Проверяем что есть файл и его память норм, иначе выдаём ошибку что копии нет или файл слишком маленький
