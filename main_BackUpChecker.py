@@ -109,7 +109,7 @@ async def check_single_file_async(file_info, command_worker, semaphore):
                         return None, None
                     return f"Macrium: {result}", path_display_name
 
-                return None, None
+            return None, None
 
         except Exception as e:
             return f"Exception: {str(e)}", path_display_name
