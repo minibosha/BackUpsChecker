@@ -76,7 +76,7 @@ async def check_single_file_async(file_info, command_worker, semaphore):
 
             check = True
             if len(data_name) >= 3:
-                if data_name[:2] == "BC" or data_name[:3] in ["BC:", "BC.", "BC_"]:
+                if data_name[:2] == "CB" or data_name[:3] in ["CB:", "CB.", "CB_"]:
                     check = False
 
             if check:
