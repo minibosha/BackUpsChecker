@@ -1,11 +1,18 @@
 """ Скачиваем библиотеки """
 import asyncio
+# import atexit
+from atexit import register
 # import datetime
 from datetime import date, timedelta, datetime
 # import os
-from os import path, scandir
+from os import path, scandir, getpid, remove
+# import sys
+from sys import exit
 # import time
 from time import sleep
+
+# import psutil
+from psutil import pid_exists
 
 # Скачиваем дополнительные файлы
 from Command_worker import CommandWorker, AsyncCommandWorker
@@ -62,19 +69,46 @@ def save_next_run_time(next_run):
 
 
 def check_single_instance():
-    """Проверяет, не запущена ли уже программа"""
-    import os
+    """Проверяет, не запущена ли уже программа с обработкой PID"""
     lock_file = "program.lock"
 
+    # Проверяем, существует ли файл блокировки
+    if path.exists(lock_file):
+        try:
+            # Читаем PID из файла
+            with open(lock_file, 'r') as f:
+                old_pid = int(f.read().strip())
+
+            # Проверяем, существует ли процесс с таким PID
+            if pid_exists(old_pid):
+                # Процесс всё ещё работает
+                return False
+            else:
+                # Процесс завершился, но файл остался (аварийное завершение)
+                remove(lock_file)
+        except (ValueError, FileNotFoundError):
+            # Файл повреждён или удалён, удаляем его
+            try:
+                remove(lock_file)
+            except:
+                pass
+
+    # Создаём новый файл блокировки
     try:
-        # Пытаемся создать файл с эксклюзивным доступом
-        fd = os.open(lock_file, os.O_CREAT | os.O_EXCL | os.O_RDWR)
-        # Записываем PID для информации
-        os.write(fd, str(os.getpid()).encode())
-        os.close(fd)
+        with open(lock_file, 'w') as f:
+            f.write(str(getpid()))
+
+        # Регистрируем удаление файла при нормальном завершении
+        def cleanup():
+            try:
+                remove(lock_file)
+            except:
+                pass
+
+        register(cleanup)
         return True
-    except FileExistsError:
-        # Файл уже существует - программа уже запущена
+
+    except Exception:
         return False
 
 
