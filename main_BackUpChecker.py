@@ -3,7 +3,7 @@ import asyncio
 # import datetime
 from datetime import date, timedelta, datetime
 # import os
-from os import path
+from os import path, scandir
 # import time
 from time import sleep
 
@@ -37,7 +37,16 @@ def load_next_run_time():
         return None
     try:
         with open(CHECK_TIME_FILE, "r", encoding="utf-8") as file:
-            return datetime.fromisoformat(file.read().strip())
+            loaded_time = datetime.fromisoformat(file.read().strip())
+
+            # Если время из файла УЖЕ прошло, возвращаем None,
+            # чтобы программа выполнила проверку сразу и установила новое расписание
+            if loaded_time <= datetime.now():
+                FileHelper().work_file(
+                    "Время из файла уже прошло. Выполняем проверку и устанавливаем новое расписание.")
+                return None
+
+            return loaded_time
     except (ValueError, OSError) as error:
         FileHelper().work_file(f"Ошибка чтения файла: {error}")
         return None
@@ -50,6 +59,23 @@ def save_next_run_time(next_run):
             file.write(next_run.isoformat())
     except OSError as error:
         FileHelper().work_file(f"Ошибка записи в файл: {error}")
+
+
+def check_single_instance():
+    """Проверяет, не запущена ли уже программа"""
+    import os
+    lock_file = "program.lock"
+
+    try:
+        # Пытаемся создать файл с эксклюзивным доступом
+        fd = os.open(lock_file, os.O_CREAT | os.O_EXCL | os.O_RDWR)
+        # Записываем PID для информации
+        os.write(fd, str(os.getpid()).encode())
+        os.close(fd)
+        return True
+    except FileExistsError:
+        # Файл уже существует - программа уже запущена
+        return False
 
 
 ''' Ассинхронные функции '''
@@ -173,6 +199,28 @@ def main_program():
         today_file: bool = False
         answer_cmd = CommandWorker.command_get('dir ' + path_curr).split()  # Получаем ответ от cmd
         curr_date, prev_date = get_dates()  # Получаем сегодняшнюю и вчерашнюю дату
+
+        # Дополнительная проверка даты
+        try:
+            # Надежное получение списка файлов через os.scandir
+            for entry in scandir(path_curr):
+                if entry.is_file():
+                    # Получаем дату изменения файла в вашем формате ДД.ММ.ГГГГ
+                    mod_time_timestamp = entry.stat().st_mtime
+                    mod_time = datetime.fromtimestamp(mod_time_timestamp).strftime("%d.%m.%Y")
+                    file_size = entry.stat().st_size  # Размер в байтах
+
+                    # Сохраняем только файлы за сегодня/вчера и не XML
+                    if mod_time in (curr_date, prev_date) and not entry.name.endswith('.xml'):
+                        data_info[entry.name] = [file_size, mod_time]
+                        if mod_time == curr_date:
+                            today_file = True
+
+        except Exception as e:
+            error_log.append(f"ERROR READING DIRECTORY {path_curr}: {str(e)}")
+            name_paths_error_log.append(names_to_paths[ind_for_err_path])
+            continue
+
         # Проверяем что у нас хватает информации
         if len(answer_cmd) < 3:
             error_log.append(f"ERROR ANSWER CMD (DIR): {answer_cmd}")
@@ -290,6 +338,11 @@ def main_program():
         errors.send_error()
 
 
+''' Проверка, что файл открыт впервые '''
+if not check_single_instance():
+    FileHelper().work_file("Программа уже запущена! Завершаем этот экземпляр.", error=True)
+    exit(0)
+
 ''' Проверка и запуск программы по времени '''
 # Конфигурационные константы
 CHECK_TIME_FILE = path.abspath("checkTimeForBC.txt")
@@ -319,10 +372,17 @@ while True:
     if current_time >= next_run:
         main_program()  # Выполнение основной программы.
 
-        # Планируем следующее выполнение
-        next_run = datetime.now()
-        next_run = next_run + timedelta(hours=CHECK_INTERVAL_HOURS)
+        # Вычисляем следующее время КАК ПРЕДЫДУЩЕЕ + ИНТЕРВАЛ
+        scheduled_next_run = next_run + timedelta(hours=CHECK_INTERVAL_HOURS)
+
+        # Если вычисленное время УЖЕ прошло (например, проверка висела 30 часов),
+        while scheduled_next_run <= datetime.now():
+            scheduled_next_run += timedelta(hours=CHECK_INTERVAL_HOURS)
+
+        # Сохраняем и используем новое время
+        next_run = scheduled_next_run
         save_next_run_time(next_run)
+
         file.work_file(f"Следующее выполнение запланировано на: {next_run}")
 
     # Рассчитываем время до следующей проверки
