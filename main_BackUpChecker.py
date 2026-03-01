@@ -5,7 +5,7 @@ from atexit import register
 # import datetime
 from datetime import date, timedelta, datetime
 # import os
-from os import path, scandir, getpid, remove
+from os import path, scandir, getpid, remove, SEEK_END
 # import sys
 from sys import exit
 # import time
@@ -22,6 +22,32 @@ from File_helper import FileHelper
 # import sys
 
 ''' Функции '''
+
+
+# Проверяет размер файла лога. Если он превышает max_size_kb КБ,
+def trim_log_file_if_needed(log_path, max_size_kb=100, trim_size_kb=75):
+    if not path.exists(log_path):
+        return
+    file_size = path.getsize(log_path)
+    max_bytes = max_size_kb * 1024
+    if file_size <= max_bytes:
+        return
+    trim_bytes = trim_size_kb * 1024
+    try:
+        with open(log_path, 'r', encoding='utf-8-sig') as f:
+            # Перемещаем указатель на trim_bytes (примерно) и читаем оставшуюся часть
+            f.seek(0, SEEK_END)
+            total_size = f.tell()
+            if total_size > trim_bytes:
+                f.seek(trim_bytes)
+            else:
+                f.seek(0)
+            data = f.read()
+        with open(log_path, 'w', encoding='utf-8-sig') as f:
+            f.write(data)
+    except Exception as e:
+        # Если что-то пошло не так, просто логируем ошибку
+        FileHelper().work_file(f"ERROR trimming log file: {e}", error=True)
 
 
 # Ограничение числа в диапазоне
@@ -43,29 +69,30 @@ def load_next_run_time():
     if not path.exists(CHECK_TIME_FILE):
         return None
     try:
-        with open(CHECK_TIME_FILE, "r", encoding="utf-8") as file:
-            loaded_time = datetime.fromisoformat(file.read().strip())
-
-            # Если время из файла УЖЕ прошло, возвращаем None,
-            # чтобы программа выполнила проверку сразу и установила новое расписание
-            if loaded_time <= datetime.now():
-                FileHelper().work_file(
-                    "Время из файла уже прошло. Выполняем проверку и устанавливаем новое расписание.")
-                return None
-
-            return loaded_time
+        with open(CHECK_TIME_FILE, "r", encoding="utf-8-sig") as file:
+            time_str = file.read().strip()
+            # Пробуем разные форматы (с пробелом или T, с секундами или без)
+            for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"):
+                try:
+                    return datetime.strptime(time_str, fmt)
+                except ValueError:
+                    continue
+            FileHelper().work_file(f"ERROR parsing time: {time_str}", error=True)
+            return None
     except (ValueError, OSError) as error:
-        FileHelper().work_file(f"Ошибка чтения файла: {error}")
+        FileHelper().work_file(f"ERROR reading time file: {error}", error=True)
         return None
 
 
 # Сохраняет время следующего выполнения в файл
 def save_next_run_time(next_run):
+    # Сохраняем время без секунд и микросекунд
+    next_run_clean = next_run.replace(second=0, microsecond=0)
     try:
-        with open(CHECK_TIME_FILE, "w", encoding="utf-8") as file:
-            file.write(next_run.isoformat())
+        with open(CHECK_TIME_FILE, "w", encoding="utf-8-sig") as file:
+            file.write(next_run_clean.strftime("%Y-%m-%d %H:%M"))
     except OSError as error:
-        FileHelper().work_file(f"Ошибка записи в файл: {error}")
+        FileHelper().work_file(f"ERROR writing time file: {error}", error=True)
 
 
 def check_single_instance():
@@ -115,98 +142,122 @@ def check_single_instance():
 ''' Ассинхронные функции '''
 
 
+# Простая асинхронная проверка одного файла
 async def check_single_file_async(file_info, command_worker, semaphore):
-    """
-    Простая асинхронная проверка одного файла
-    file_info: кортеж (data_name, obj, path_curr, path_display_name, curr_date, prev_date, today_file, password_7_zip, path_to_7_zip, files)
-    """
-    # Распаковываем все параметры
+    # Распаковываем данные
     (data_name, obj, path_curr, path_display_name,
      curr_date, prev_date, today_file,
-     password_7_zip, path_to_7_zip, files) = file_info
+     password_7_zip, path_to_7_zip, files, flags) = file_info
+
+    # Флаг --skip (уже отфильтрован на предыдущем этапе, но на всякий случай)
+    if flags.get('skip'):
+        files.work_file(f'Skipping {data_name} (flag --skip)')
+        return None, None
+
+    # Таймаут из флага (по умолчанию 5400)
+    timeout = int(flags.get('timeout', 5400))
+
+    # Фильтрация по расширениям (повторно на случай, если файл не был отфильтрован ранее)
+    extension = data_name.split(".")[-1].lower() if '.' in data_name else ''
+    if 'ignore_extensions' in flags:
+        ignored = [ext.strip().lower() for ext in flags['ignore_extensions'].split(',')]
+        if extension in ignored:
+            return None, None
+    if 'extensions' in flags:
+        allowed = [ext.strip().lower() for ext in flags['extensions'].split(',')]
+        if extension not in allowed:
+            return None, None
+
+    # Таймаут из флага (по умолчанию 5400)
+    timeout = int(flags.get('timeout', 5400))
 
     async with semaphore:
         try:
-            # Проверяем актуальность файла
-            if obj[1] != curr_date and not (obj[1] == prev_date and not today_file):
-                return None, None  # Файл не актуален
+            # Проверка даты (если нет флага --force)
+            if not flags.get('force'):
+                if obj[1] != curr_date and not (obj[1] == prev_date and not today_file):
+                    return None, None
 
             path_to_file_name = path.join(path_curr, data_name)
             extension = data_name.split(".")[-1].lower()
 
+            # Пропускаем служебные файлы (CB*)
             check = True
             if len(data_name) >= 3:
                 if data_name[:2] == "CB" or data_name[:3] in ["CB:", "CB.", "CB_"]:
                     check = False
 
             if check:
-                # 7ZIP
+                #  Проверка 7-ZIP архивов
                 if extension in ["zip", "rar", "gz", "7z"]:
                     command = f'"{path_to_7_zip}" t -p"{password_7_zip}" "{path_to_file_name}"'
-                    result = await command_worker.command_get_async(command)
+                    result = await command_worker.command_get_async(command, timeout=timeout)
                     if 'Everything is Ok' in result:
                         files.work_file(f'7Zip, {path_to_file_name} - OK')
                         return None, None
+                    # Флаг --ignore-errors: не возвращаем ошибку, только логируем
+                    if flags.get('ignore_errors'):
+                        files.work_file(f'7Zip error ignored: {result[:200]}...')
+                        return None, None
                     return f"7Zip: {result}", path_display_name
 
-                # ACRONIS
+                #  Проверка Acronis образов
                 elif extension in ["tib", "tibx", "TIB", "TIBX"]:
                     command = f'acrocmd validate backup --loc={path_curr} --arc={data_name}'
-                    result = await command_worker.command_get_async(command)
+                    result = await command_worker.command_get_async(command, timeout=timeout)
                     success_patterns = ['completed successfully', 'завершено успешно']
                     if any(pattern in result for pattern in success_patterns):
                         files.work_file(f'Acronis, {path_to_file_name} - OK')
                         return None, None
+                    if flags.get('ignore_errors'):
+                        files.work_file(f'Acronis error ignored: {result[:200]}...')
+                        return None, None
                     return f"Acronis: {result}", path_display_name
 
-                # MACRIUM
+                #  Проверка Macrium образов
                 elif extension in ["mrimg", "mrbakx"]:
                     command = f'"C:\\Program Files\\Macrium\\Reflect\\mrverify.exe" "{path_to_file_name}" --password "{password_7_zip}"'
-                    result = await command_worker.command_get_async(command)
+                    result = await command_worker.command_get_async(command, timeout=timeout)
                     success_patterns = ['Verification succeeded', 'Проверка прошла успешно']
                     if any(pattern in result for pattern in success_patterns):
                         files.work_file(f'Macrium, {path_to_file_name} - OK')
+                        return None, None
+                    if flags.get('ignore_errors'):
+                        files.work_file(f'Macrium error ignored: {result[:200]}...')
                         return None, None
                     return f"Macrium: {result}", path_display_name
 
             return None, None
 
         except Exception as e:
-            return f"Exception: {str(e)}", path_display_name
+            # Детальная запись об исключении
+            import traceback
+            tb = traceback.format_exc()
+            files.work_file(f'Exception in {data_name}: {type(e).__name__}: {e}\n{tb}', error=True)
+            return f"Exception: {type(e).__name__}: {e}", path_display_name
 
 
+# Проверяет все файлы с ограничением в 4 одновременные задачи
 async def check_all_files_async(file_tasks):
-    """
-    Проверяет все файлы с ограничением в 4 одновременные задачи
-    Возвращает: (error_log, path_log)
-    """
     semaphore = asyncio.Semaphore(4)
     command_worker = AsyncCommandWorker(max_workers=4)
 
     try:
-        # Создаем задачи
-        tasks = []
-        for file_info in file_tasks:
-            task = check_single_file_async(file_info, command_worker, semaphore)
-            tasks.append(task)
-
-        # Запускаем все задачи
+        tasks = [check_single_file_async(file_info, command_worker, semaphore) for file_info in file_tasks]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # Собираем ошибки
         error_log = []
         path_log = []
 
         for result in results:
             if isinstance(result, Exception):
-                error_log.append(f"Task error: {str(result)}")
+                error_log.append(f"Task error: {type(result).__name__}: {str(result)}")
                 path_log.append("Unknown")
-            elif result[0] is not None:  # Есть ошибка
+            elif result[0] is not None:
                 error_log.append(result[0])
                 path_log.append(result[1])
 
         return error_log, path_log
-
     finally:
         command_worker.executor.shutdown(wait=True)
 
@@ -222,8 +273,11 @@ def main_program():
     files = FileHelper()  # Класс для быстрой работы с файлами
     async_tasks = []  # Класс для ассинхронной проверки всех файлов
 
+    # Обрезаем лог-файл, если он слишком большой (один раз за запуск)
+    trim_log_file_if_needed(files.file_work_path, 100, 75)
+
     ''' Считываем данные с файлов '''
-    name_comp, paths, names_to_paths = files.log_file()
+    name_comp, paths, names_to_paths, global_flags_list, file_flags_list = files.log_file()
     path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
     ''' Получаем командой информацию о файлах в пути через dir '''
@@ -333,22 +387,59 @@ def main_program():
             error_log.append(f'There are no files for today or tomorrow in path {path_curr}.')
             name_paths_error_log.append(names_to_paths[ind_for_err_path])
         else:
+            # Проверяем память и дату на каждый файл
             for key, obj in data_info.items():
                 if obj[1] == curr_date or (obj[1] == prev_date and not today_file):
-                    if obj[0] > 5242880:
-                        files.work_file(
-                            f'{curr_date} check: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.')  # Лог, что с этим файлом всё ок
+                    # Получаем глобальные флаги для текущего пути
+                    global_flags = global_flags_list[ind_for_err_path]
+                    # Получаем флаги для конкретного файла (если есть)
+                    file_specific = file_flags_list[ind_for_err_path].get(key, {})
+                    # Объединяем: файловые флаги переопределяют глобальные
+                    final_flags = {**global_flags, **file_specific}
+
+                    # Фильтрация по расширениям и флагу skip
+                    extension = key.split(".")[-1].lower() if '.' in key else ''
+
+                    # Флаг --skip: полностью пропускаем файл
+                    if final_flags.get('skip'):
+                        files.work_file(f'Skipping {key} (flag --skip)')
+                        continue  # не добавляем в отчёт и не проверяем размер
+
+                    # Флаг --ignore_extensions: пропускаем файлы с указанными расширениями
+                    if 'ignore_extensions' in final_flags:
+                        ignored = [ext.strip().lower() for ext in final_flags['ignore_extensions'].split(',')]
+                        if extension in ignored:
+                            files.work_file(f'Skipping {key} (extension in ignore list)')
+                            continue
+
+                    # Флаг --extensions: проверяем только указанные расширения
+                    if 'extensions' in final_flags:
+                        allowed = [ext.strip().lower() for ext in final_flags['extensions'].split(',')]
+                        if extension not in allowed:
+                            files.work_file(f'Skipping {key} (extension not in allowed list)')
+                            continue
+
+                    # Проверка размера (если не отключена флагом skip_size)
+                    min_size = int(final_flags.get('min_size', 5242880))  # по умолчанию 5 МБ
+
+                    if not final_flags.get('skip_size'):
+                        if obj[0] > min_size:
+                            files.work_file(
+                                f'{curr_date} check: The {key} file occupies {obj[0]} bytes of memory and its creation date is {obj[1]}.')
+                        else:
+                            er_txt = f'{curr_date} ERROR: The {key} file occupies {obj[0]} bytes of memory (<{min_size} bytes) and its creation date is {obj[1]}.'
+                            files.work_file(er_txt, error=True)
+                            error_log.append(er_txt)
+                            name_paths_error_log.append(names_to_paths[ind_for_err_path])
                     else:
-                        er_txt = f'{curr_date} ERROR: The {key} file occupies {obj[0]} bytes of memory (<5Mb) and its creation date is {obj[1]}.'
-                        files.work_file(er_txt, error=True)
-                        error_log.append(er_txt)
-                        name_paths_error_log.append(names_to_paths[ind_for_err_path])
+                        files.work_file(f'{curr_date} info: Skipped size check for {key} (size: {obj[0]} bytes)')
 
                 # Собираем информацию для асинхронной проверки
                 file_info = (
                     key, obj, path_curr, names_to_paths[ind_for_err_path],
                     curr_date, prev_date, today_file,
-                    password_7_zip, path_to_7_zip, files
+                    password_7_zip, path_to_7_zip, files,
+                    final_flags  # Используем уже готовые флаги
                 )
                 async_tasks.append(file_info)
 

@@ -19,7 +19,6 @@ from telebot import TeleBot
 
 from File_helper import FileHelper
 
-
 # Подгрузка токена бота и его создание
 load_dotenv()
 
@@ -244,7 +243,12 @@ class ErrorFeedback:
             IDS = parse_telegram_ids_from_string(getenv('TEST_IDS'))
 
             for ID in IDS:
-                Bot.send_message(ID, self.error_log_txt)
+                if len(self.error_log_txt) > 4096:
+                    # Разбиваем на части, если большое сообщение
+                    for i in range(0, len(self.error_log_txt), 4096):
+                        Bot.send_message(ID, self.error_log_txt[i:i + 4096])
+                else:
+                    Bot.send_message(ID, self.error_log_txt)
         except Exception as e:
             file = FileHelper()
             file.work_file(f"Ошибка отправки телеграмм: {str(e)}")
