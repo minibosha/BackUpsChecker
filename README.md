@@ -1,5 +1,5 @@
 # The project not ready yet, in beta. 
-# README.txt was created by AI (deepseek), may contain errors in file. 
+# README.txt was created by AI (deepseek), may contain errors in this file. 
 
 
 ## Backup Checker
