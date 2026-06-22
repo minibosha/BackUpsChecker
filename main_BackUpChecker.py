@@ -19,8 +19,6 @@ from Command_worker import CommandWorker, AsyncCommandWorker
 from Error_feedback import ErrorFeedback
 from File_helper import FileHelper
 
-# import sys
-
 ''' Функции '''
 
 
@@ -280,6 +278,15 @@ def main_program():
     name_comp, paths, names_to_paths, global_flags_list, file_flags_list = files.log_file()
     path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
+    ''' Считываем и парсим данные с Checked.txt'''
+    files_to_check = set()
+    checked = set()
+    if not path.exists(path.abspath("checked.txt")):
+        checked = set()
+    else:
+        with open(path.abspath("checked.txt"), 'r', encoding='utf-8') as f:
+            checked = {line.strip() for line in f if line.strip()}
+
     ''' Получаем командой информацию о файлах в пути через dir '''
     for ind_for_err_path, path_curr in enumerate(paths):
         data_info = {}  # Обнуляем информацию, чтобы не было ошибок с одинаковым названием файлов
@@ -434,6 +441,10 @@ def main_program():
                     else:
                         files.work_file(f'{curr_date} info: Skipped size check for {key} (size: {obj[0]} bytes)')
 
+                # Сохраняем данные для проверки наличия/отсутствия файла
+                full_path = path.join(path_curr, key)
+                files_to_check.add(full_path)
+
                 # Собираем информацию для асинхронной проверки
                 file_info = (
                     key, obj, path_curr, names_to_paths[ind_for_err_path],
@@ -443,7 +454,29 @@ def main_program():
                 )
                 async_tasks.append(file_info)
 
-    # Асинхронно проверяем все файлы на наличие ошибок
+    ''' Сравниваем checked с текущими файлами '''
+    missing_files = checked - files_to_check
+    new_files = files_to_check - checked
+
+    # Обрабатываем пропавшие файлы
+    if missing_files:
+        for missing in missing_files:
+            er_txt = f"FILE MISSING: {missing} was previously checked but now not found."
+            files.work_file(er_txt, error=True)
+            error_log.append(er_txt)
+            name_paths_error_log.append(missing)  # или можно добавить имя бэкапа, если есть
+        # Удаляем пропавшие из checked (чтобы не повторять ошибку)
+        checked -= missing_files
+
+    # Добавляем новые файлы в checked
+    checked |= new_files
+
+    # Сохраняем обновлённый checked
+    with open(path.abspath("checked.txt"), 'w', encoding='utf-8') as f:
+        for p in sorted(checked):
+            f.write(p + '\n')
+
+    ''' Асинхронно проверяем все файлы на наличие ошибок '''
     if async_tasks:
         try:
             errors_async, paths_async = asyncio.run(check_all_files_async(async_tasks))
