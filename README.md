@@ -243,11 +243,11 @@ OldData
 
 ---
 
-## Лицензия
+## Создание программы через Pyinstaller
 
-Проект распространяется под лицензией **MIT**. Используйте на свой страх и риск.
-
----
+``` cmd
+pyinstaller --onefile --noconsole --name="BackupChecker" --add-data="filepaths_ch.txt;." --add-data="passwordFor7zip_ch.txt;." --add-data="checkTimeForBC.txt;." --hidden-import=email.mime.multipart --hidden-import=email.mime.text --hidden-import=telebot --hidden-import=dotenv --hidden-import=psutil --hidden-import=os --clean main_BackUpChecker.py 
+```
 
 ## Контакты
 
