@@ -279,13 +279,23 @@ def main_program():
     path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
     ''' Считываем и парсим данные с Checked.txt'''
-    files_to_check = set()
-    checked = set()
-    if not path.exists(path.abspath("checked.txt")):
-        checked = set()
+    main_info = {}
+    if not path.exists("checked.txt"):
+        main_info = {}
     else:
-        with open(path.abspath("checked.txt"), 'r', encoding='utf-8') as f:
-            checked = {line.strip() for line in f if line.strip()}
+        with open("checked.txt", 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split('|')
+                if len(parts) == 3:
+                    key, file_path, size_str = parts
+                    try:
+                        size = int(size_str)
+                        main_info[key] = (file_path, size)
+                    except ValueError:
+                        continue
 
     ''' Получаем командой информацию о файлах в пути через dir '''
     for ind_for_err_path, path_curr in enumerate(paths):
@@ -310,11 +320,57 @@ def main_program():
                         data_info[entry.name] = [file_size, mod_time]
                         if mod_time == curr_date:
                             today_file = True
-
         except Exception as e:
             error_log.append(f"ERROR READING DIRECTORY {path_curr}: {str(e)}")
             name_paths_error_log.append(names_to_paths[ind_for_err_path])
             continue
+
+        # Сравниваем checked с текущими файлами.
+        # Ищем самый большой файл в текущей папке (игнорируем .xml и служебные)
+        largest_file = None
+        largest_size = -1
+        try:
+            for entry in scandir(path_curr):
+                if entry.is_file():
+                    name = entry.name
+                    if name.endswith('.xml'):
+                        continue
+                    if len(name) >= 3 and (name[:2] == "CB" or name[:3] in ["CB:", "CB.", "CB_"]):
+                        continue
+                    size = entry.stat().st_size
+                    if size > largest_size:
+                        largest_size = size
+                        largest_file = entry.path
+        except Exception as e:
+            error_log.append(f"ERROR scanning for main file in {path_curr}: {e}")
+            name_paths_error_log.append(names_to_paths[ind_for_err_path])
+            continue
+
+        key_checked_txt = names_to_paths[ind_for_err_path] if names_to_paths[ind_for_err_path] else path_curr
+
+        if largest_file is not None:
+            prev_info = main_info.get(key_checked_txt)
+            if prev_info:
+                prev_path, prev_size = prev_info
+                if largest_size < prev_size * 0.75:
+                    er_txt = (f"MAIN BACKUP SIZE DROPPED: current main file {largest_file} "
+                              f"size {largest_size} is less than 75% of previous main {prev_path} "
+                              f"size {prev_size}.")
+                    files.work_file(er_txt, error=True)
+                    error_log.append(er_txt)
+                    name_paths_error_log.append(key_checked_txt)
+            # Обновляем информацию
+            main_info[key_checked_txt] = (largest_file, largest_size)
+        else:
+            er_txt = f"No files found in {path_curr}, cannot determine main backup."
+            files.work_file(er_txt, error=True)
+            error_log.append(er_txt)
+            name_paths_error_log.append(key)
+
+        # Сохраняем файлы в checked.txt
+        with open("checked.txt", 'w', encoding='utf-8') as f:
+            for key, (file_path, size) in main_info.items():
+                f.write(f"{key}|{file_path}|{size}\n")
 
         # Проверяем что у нас хватает информации
         if len(answer_cmd) < 3:
@@ -441,10 +497,6 @@ def main_program():
                     else:
                         files.work_file(f'{curr_date} info: Skipped size check for {key} (size: {obj[0]} bytes)')
 
-                # Сохраняем данные для проверки наличия/отсутствия файла
-                full_path = path.join(path_curr, key)
-                files_to_check.add(full_path)
-
                 # Собираем информацию для асинхронной проверки
                 file_info = (
                     key, obj, path_curr, names_to_paths[ind_for_err_path],
@@ -453,28 +505,6 @@ def main_program():
                     final_flags  # Используем уже готовые флаги
                 )
                 async_tasks.append(file_info)
-
-    ''' Сравниваем checked с текущими файлами '''
-    missing_files = checked - files_to_check
-    new_files = files_to_check - checked
-
-    # Обрабатываем пропавшие файлы
-    if missing_files:
-        for missing in missing_files:
-            er_txt = f"FILE MISSING: {missing} was previously checked but now not found."
-            files.work_file(er_txt, error=True)
-            error_log.append(er_txt)
-            name_paths_error_log.append(missing)  # или можно добавить имя бэкапа, если есть
-        # Удаляем пропавшие из checked (чтобы не повторять ошибку)
-        checked -= missing_files
-
-    # Добавляем новые файлы в checked
-    checked |= new_files
-
-    # Сохраняем обновлённый checked
-    with open(path.abspath("checked.txt"), 'w', encoding='utf-8') as f:
-        for p in sorted(checked):
-            f.write(p + '\n')
 
     ''' Асинхронно проверяем все файлы на наличие ошибок '''
     if async_tasks:
