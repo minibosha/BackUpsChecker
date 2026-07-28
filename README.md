@@ -245,8 +245,23 @@ OldData
 
 ## Создание программы через Pyinstaller
 
-``` cmd
+windows:
+``` cmd_windows
 pyinstaller --onefile --noconsole --name="BackupChecker" --add-data="filepaths_ch.txt;." --add-data="passwordFor7zip_ch.txt;." --add-data="checkTimeForBC.txt;." --hidden-import=email.mime.multipart --hidden-import=email.mime.text --hidden-import=telebot --hidden-import=dotenv --hidden-import=psutil --hidden-import=os --clean main_BackUpChecker.py 
+```
+mac:
+```cmd_mac
+pyinstaller --onefile --noconsole --name="BackupChecker" \
+  --add-data "filepaths_ch.txt:." \
+  --add-data "passwordFor7zip_ch.txt:." \
+  --add-data "checkTimeForBC.txt:." \
+  --hidden-import=email.mime.multipart \
+  --hidden-import=email.mime.text \
+  --hidden-import=telebot \
+  --hidden-import=dotenv \
+  --hidden-import=psutil \
+  --clean \
+  main_BackUpChecker.py
 ```
 
 ## Контакты

@@ -452,6 +452,7 @@ def main_program():
         else:
             # Проверяем память и дату на каждый файл
             for key, obj in data_info.items():
+                final_flags = {}
                 if obj[1] == curr_date or (obj[1] == prev_date and not today_file):
                     # Получаем глобальные флаги для текущего пути
                     global_flags = global_flags_list[ind_for_err_path]
