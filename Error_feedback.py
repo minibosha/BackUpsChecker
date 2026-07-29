@@ -196,7 +196,7 @@ class ErrorFeedback:
             context = create_default_context()
 
             # Используем контекстный менеджер для автоматического закрытия соединения
-            with SMTP_SSL("smtp.yandex.com", 465, context=context) as server:
+            with SMTP_SSL(getenv('SMTP_SERVER'), 465, context=context) as server:
                 # Аутентификация
                 server.login(getenv('MAIL_FROM'), getenv('MAIL_PASSWORD'))
 
