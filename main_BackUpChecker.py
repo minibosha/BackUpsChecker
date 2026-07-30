@@ -145,7 +145,7 @@ async def check_single_file_async(file_info, command_worker, semaphore):
     # Распаковываем данные
     (data_name, obj, path_curr, path_display_name,
      curr_date, prev_date, today_file,
-     password_7_zip, path_to_7_zip, files, flags) = file_info
+     password_7_zip, path_to_7_zip, files, flags, main_flags) = file_info
 
     # Флаг --skip (уже отфильтрован на предыдущем этапе, но на всякий случай)
     if flags.get('skip'):
@@ -164,7 +164,12 @@ async def check_single_file_async(file_info, command_worker, semaphore):
             return None, None
 
     # Таймаут из флага (по умолчанию 5400)
-    timeout = int(flags.get('timeout', 43800))
+    timeout = 5400
+    if int(flags.get('timeout', 5400)) == 5400:
+        if "min_size" in main_flags.keys():
+            timeout = main_flags['min_size']
+    else:
+        timeout = int(flags.get('timeout', 5400))
 
     async with semaphore:
         try:
@@ -236,6 +241,9 @@ async def check_single_file_async(file_info, command_worker, semaphore):
 async def check_all_files_async(file_tasks):
     semaphore = asyncio.Semaphore(4)
     command_worker = AsyncCommandWorker(max_workers=4)
+    if "semaphore" in file_tasks[-1][-1].keys():
+        semaphore = asyncio.Semaphore(file_tasks[-1][-1]["semaphore"])
+        command_worker = AsyncCommandWorker(max_workers=file_tasks[-1][-1]["semaphore"])
 
     try:
         tasks = [check_single_file_async(file_info, command_worker, semaphore) for file_info in file_tasks]
@@ -272,7 +280,7 @@ def main_program():
     trim_log_file_if_needed(files.file_work_path, 100, 75)
 
     ''' Считываем данные с файлов '''
-    name_comp, paths, names_to_paths, global_flags_list, file_flags_list = files.log_file()
+    name_comp, paths, names_to_paths, global_flags_list, file_flags_list, main_flags = files.log_file()
     path_to_7_zip, password_7_zip = files.passwordFor7zip_ch()
 
     ''' Считываем и парсим данные с Checked.txt'''
@@ -481,7 +489,12 @@ def main_program():
                             continue
 
                     # Проверка размера (если не отключена флагом skip_size)
-                    min_size = int(final_flags.get('min_size', 5242880))  # по умолчанию 5 МБ
+                    min_size = 5242880
+                    if int(final_flags.get('min_size', 5242880)) == 5242880:
+                        if "min_size" in main_flags:
+                            min_size = main_flags["min_size"]
+                    else:
+                        min_size = int(final_flags.get('min_size', 5242880))
 
                     if not final_flags.get('skip_size'):
                         if obj[0] > min_size:
@@ -500,7 +513,7 @@ def main_program():
                     key, obj, path_curr, names_to_paths[ind_for_err_path],
                     curr_date, prev_date, today_file,
                     password_7_zip, path_to_7_zip, files,
-                    final_flags  # Используем уже готовые флаги
+                    final_flags, main_flags  # Используем уже готовые флаги
                 )
                 async_tasks.append(file_info)
 

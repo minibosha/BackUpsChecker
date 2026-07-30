@@ -1,7 +1,7 @@
 # Библиотека для получения пути к файлу
 import shlex  # Для разбора строк с флагами
 # import sys
-from sys import exit
+from sys import exit, exception
 
 from Command_worker import CommandWorker
 
@@ -34,7 +34,26 @@ class FileHelper:
 
                 name_comp = lines[0]  # первая строка – имя компьютера
 
+                # Проверяем, что вторая строка не имеет глобальных флагов для всех
                 i = 1
+                main_flags = {}
+                try:
+                    if "--" in lines[1]:
+                        main_flags_in_line1 = lines[1].split("--")
+
+                        for main_flag in main_flags_in_line1:
+                            if main_flag == "":
+                                continue
+                            elif "min_size" in main_flag:
+                                main_flags["min_size"] = int(main_flag.split("=")[1])
+                            elif "semaphore" in main_flag:
+                                main_flags["semaphore"] = int(main_flag.split("=")[1])
+                            elif "timeout" in main_flag:
+                                main_flags["timeout"] = int(main_flag.split("=")[1])
+                        i += 1
+                except Exception as e:
+                    cls.work_file(f"Error in parsing main flags: {e}", error=True)
+
                 while i < len(lines):
                     #  Чтение пути
                     path_line = lines[i]
@@ -118,7 +137,7 @@ class FileHelper:
                     file_flags_list.append({})
 
                 if name_comp and paths:
-                    return name_comp, paths, names_to_paths, global_flags_list, file_flags_list
+                    return name_comp, paths, names_to_paths, global_flags_list, file_flags_list, main_flags
                 else:
                     cls.work_file(
                         'ERROR: Less than two lines in a file "filepaths_ch.txt".\nRequired format:\ncomputer_name\npath1\nname_to_path1\npath2\nname_to_path2\n...',
