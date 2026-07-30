@@ -152,9 +152,6 @@ async def check_single_file_async(file_info, command_worker, semaphore):
         files.work_file(f'Skipping {data_name} (flag --skip)')
         return None, None
 
-    # Таймаут из флага (по умолчанию 5400)
-    timeout = int(flags.get('timeout', 5400))
-
     # Фильтрация по расширениям (повторно на случай, если файл не был отфильтрован ранее)
     extension = data_name.split(".")[-1].lower() if '.' in data_name else ''
     if 'ignore_extensions' in flags:
@@ -167,7 +164,7 @@ async def check_single_file_async(file_info, command_worker, semaphore):
             return None, None
 
     # Таймаут из флага (по умолчанию 5400)
-    timeout = int(flags.get('timeout', 5400))
+    timeout = int(flags.get('timeout', 43800))
 
     async with semaphore:
         try:
