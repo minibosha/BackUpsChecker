@@ -164,12 +164,7 @@ async def check_single_file_async(file_info, command_worker, semaphore):
             return None, None
 
     # Таймаут из флага (по умолчанию 5400)
-    timeout = 5400
-    if int(flags.get('timeout', 5400)) == 5400:
-        if "min_size" in main_flags.keys():
-            timeout = main_flags['min_size']
-    else:
-        timeout = int(flags.get('timeout', 5400))
+    timeout = int(flags.get('timeout', main_flags.get('timeout', 5400)))
 
     async with semaphore:
         try:
@@ -241,7 +236,7 @@ async def check_single_file_async(file_info, command_worker, semaphore):
 async def check_all_files_async(file_tasks):
     semaphore = asyncio.Semaphore(4)
     command_worker = AsyncCommandWorker(max_workers=4)
-    if "semaphore" in file_tasks[-1][-1].keys():
+    if file_tasks and "semaphore" in file_tasks[-1][-1]:
         semaphore = asyncio.Semaphore(file_tasks[-1][-1]["semaphore"])
         command_worker = AsyncCommandWorker(max_workers=file_tasks[-1][-1]["semaphore"])
 
@@ -489,12 +484,7 @@ def main_program():
                             continue
 
                     # Проверка размера (если не отключена флагом skip_size)
-                    min_size = 5242880
-                    if int(final_flags.get('min_size', 5242880)) == 5242880:
-                        if "min_size" in main_flags:
-                            min_size = main_flags["min_size"]
-                    else:
-                        min_size = int(final_flags.get('min_size', 5242880))
+                    min_size = int(final_flags.get('min_size', main_flags.get('min_size', 5242880)))
 
                     if not final_flags.get('skip_size'):
                         if obj[0] > min_size:
