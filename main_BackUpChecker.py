@@ -5,14 +5,14 @@ import sys
 from atexit import register
 # import datetime
 from datetime import date, timedelta, datetime
+# import gc
+from gc import collect
 # import os
 from os import path, scandir, getpid, remove, SEEK_END
 # import sys
 from sys import exit
 # import time
 from time import sleep, time
-# import gc
-from gc import collect
 
 # import psutil
 from psutil import pid_exists

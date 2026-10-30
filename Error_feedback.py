@@ -229,7 +229,7 @@ class ErrorFeedback:
 
         '''
         # Если нужно получить ID
-        
+
         @Bot.message_handler(commands=['start'])
         def get_id(message):
             print(message.chat.id)
