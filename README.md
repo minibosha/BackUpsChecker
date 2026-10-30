@@ -61,6 +61,7 @@ pyTelegramBotAPI
 ├── passwordFor7zip_ch.txt     # путь к 7z.exe и пароль для архивов
 ├── checkTimeForBC.txt         # время следующей проверки
 ├── .env                       # переменные окружения (почта, токен бота)
+├── ckecked.txt                # файл для проверки изменения памяти файла (создаётся автоматически)
 └── work_log_ch.txt            # лог-файл (создаётся автоматически)
 ```
 
@@ -190,15 +191,17 @@ MySecretPassword123
 ### 3. Файл `.env` – настройка уведомлений
 
 ```ini
-# Почта (Yandex)
+# Почта
 MAIL_FROM=your_login@yandex.ru
 MAIL_PASSWORD=your_app_password
 MAIL_TO=recipient@example.com          # основной получатель
 MAIL_TO_TEST=test@example.com          # тестовый получатель
+SMTP_SERVER="aboba.send.ru"            # сервер для отправки сообщения
 
 # Telegram Bot
 TOKEN=1234567890:ABCdefGHIjkl...
-TEST_IDS=12345678,98765432            # список ID через запятую
+TEST_IDS=12345678,98765432            # список ID для тестов через запятую
+IDS=12345678,374657584                # список ID не для тестов через запятую
 ```
 
 ### 4. Файл `checkTimeForBC.txt`
