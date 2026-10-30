@@ -1,5 +1,6 @@
 """ Скачиваем библиотеки """
 import asyncio
+import sys
 # import atexit
 from atexit import register
 # import datetime
@@ -9,7 +10,9 @@ from os import path, scandir, getpid, remove, SEEK_END
 # import sys
 from sys import exit
 # import time
-from time import sleep
+from time import sleep, time
+# import gc
+from gc import collect
 
 # import psutil
 from psutil import pid_exists
@@ -93,37 +96,48 @@ def save_next_run_time(next_run):
         FileHelper().work_file(f"ERROR writing time file: {error}", error=True)
 
 
+# Проверяет, не запущена ли уже программа с обработкой PID
 def check_single_instance():
-    """Проверяет, не запущена ли уже программа с обработкой PID"""
-    lock_file = "program.lock"
+    # Определяем папку, где лежит программа
+    # Проверяем, запущена ли программа как скомпилированный .exe (PyInstaller)
+    if getattr(sys, 'frozen', False):
+        base_dir = path.dirname(sys.executable)
+    else:
+        base_dir = path.dirname(path.abspath(__file__))
 
-    # Проверяем, существует ли файл блокировки
+    # Формируем абсолютный путь к lock-файлу
+    lock_file = path.join(base_dir, "program.lock")
+
+    # Проверяем, существует ли уже lock-файл
     if path.exists(lock_file):
         try:
-            # Читаем PID из файла
             with open(lock_file, 'r') as f:
                 old_pid = int(f.read().strip())
 
-            # Проверяем, существует ли процесс с таким PID
+            # Проверяем, жив ли еще процесс, который создал этот lock (по его PID)
             if pid_exists(old_pid):
-                # Процесс всё ещё работает
-                return False
+                # Если файл был создан более 3 часов назад, значит программа зависла.
+                if time() - path.getmtime(lock_file) > 3 * 3600:
+                    remove(lock_file)
+                else:
+                    return False
             else:
-                # Процесс завершился, но файл остался (аварийное завершение)
+                # Если процесс с таким PID уже мертв, но файл остался — просто удаляем мусор
                 remove(lock_file)
         except (ValueError, FileNotFoundError):
-            # Файл повреждён или удалён, удаляем его
+            # Если файл поврежден (внутри не число) или исчез, пока мы его читали — удаляем его
             try:
                 remove(lock_file)
             except:
                 pass
 
-    # Создаём новый файл блокировки
+    # Создаем новый lock-файл (АТОМАРНО)
     try:
-        with open(lock_file, 'w') as f:
+        # Режим 'x' означает "создать файл, выдать ошибку, если он уже существует"
+        with open(lock_file, 'x', encoding='utf-8') as f:
             f.write(str(getpid()))
 
-        # Регистрируем удаление файла при нормальном завершении
+        # Регистрируем удаление lock-файла при выходе
         def cleanup():
             try:
                 remove(lock_file)
@@ -132,8 +146,10 @@ def check_single_instance():
 
         register(cleanup)
         return True
-
-    except Exception:
+    except FileExistsError:
+        return False
+    except Exception as e:
+        FileHelper().work_file(f"Ошибка создания lock: {e}", error=True)
         return False
 
 
@@ -517,6 +533,10 @@ def main_program():
             files.work_file(f'Async check failed: {e}', error=True)
             error_log.append(str(e))
             name_paths_error_log.append(names_to_paths[0])
+
+    # Выдаём ошибки, если они есть
+    # Принудительная очистка памяти после каждой проверки
+    collect()
 
     # Выдаём ошибки, если они есть
     # Парсим данные

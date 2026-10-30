@@ -185,7 +185,7 @@ class ErrorFeedback:
     # Отправляем ошибки
     def send_error(self):
         self.email_error()
-        self.tg_error()
+        # self.tg_error()  # Пока отключён, так как телеграмм не работает
         self.file_error(FileHelper())
 
     # Отправляем ошибку по почте
@@ -196,7 +196,7 @@ class ErrorFeedback:
             context = create_default_context()
 
             # Используем контекстный менеджер для автоматического закрытия соединения
-            with SMTP_SSL(getenv('SMTP_SERVER'), 465, context=context) as server:
+            with SMTP_SSL(getenv('SMTP_SERVER'), 465, context=context, timeout=180) as server:
                 # Аутентификация
                 server.login(getenv('MAIL_FROM'), getenv('MAIL_PASSWORD'))
 
@@ -238,7 +238,7 @@ class ErrorFeedback:
         # Выводим сообщения
         try:
             # Рабочий
-            # IDS = loads(getenv('IDS'))
+            # IDS = parse_telegram_ids_from_string(loads(getenv('IDS')))
             # Тестирование
             IDS = parse_telegram_ids_from_string(getenv('TEST_IDS'))
 
